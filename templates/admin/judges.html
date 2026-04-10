@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Judges{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Manage Judges</h2>
+    <a class="btn btn-outline-secondary" href="{{ url_for('admin.dashboard') }}">Back to Dashboard</a>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <h3 class="h5 mb-3">Add Judge</h3>
+        <form method="post" class="row g-3" novalidate>
+            <div class="col-md-6">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" id="username" name="username" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" id="email" name="email" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+                <label for="display_name" class="form-label">Display Name</label>
+                <input type="text" id="display_name" name="display_name" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" id="password" name="password" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+                <label for="phone" class="form-label">Phone (Optional)</label>
+                <input type="text" id="phone" name="phone" class="form-control">
+            </div>
+            <div class="col-md-6">
+                <label for="organization" class="form-label">Organization (Optional)</label>
+                <input type="text" id="organization" name="organization" class="form-control">
+            </div>
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary">Create Judge</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <h3 class="h5 mb-3">Existing Judges</h3>
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Display Name</th>
+                        <th>Phone</th>
+                        <th>Organization</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user, judge in judges %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ judge.display_name }}</td>
+                        <td>{{ judge.phone or '-' }}</td>
+                        <td>{{ judge.organization or '-' }}</td>
+                        <td>
+                            <form method="post" action="{{ url_for('admin.delete_judge', user_id=user.id) }}" onsubmit="return confirm('Delete this judge?');">
+                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted">No judges found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

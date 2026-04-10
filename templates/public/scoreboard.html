@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Live Scoreboard{% endblock %}
+
+{% block content %}
+<h2 class="mb-3">Live Scoreboard</h2>
+<div class="table-responsive">
+    <table class="table table-striped table-bordered align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>Rank</th>
+                <th>Team</th>
+                <th>Theme</th>
+                <th>Total Score</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+            <tr>
+                <td>{{ row.rank }}</td>
+                <td>{{ row.team_name }}</td>
+                <td>{{ row.theme }}</td>
+                <td>{{ '%.2f'|format(row.total_score) }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4" class="text-center text-muted">No active teams found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
