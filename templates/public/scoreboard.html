@@ -48,7 +48,7 @@
             </tr>
             {% else %}
             <tr>
-                <td colspan="5" class="text-center text-muted">No active teams found.</td>
+                <td colspan="5" class="text-center text-muted">No teams found.</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -78,7 +78,7 @@
 
         if (!rows || rows.length === 0) {
             const emptyRow = document.createElement('tr');
-            emptyRow.innerHTML = '<td colspan="5" class="text-center text-muted">No active teams found.</td>';
+            emptyRow.innerHTML = '<td colspan="5" class="text-center text-muted">No teams found.</td>';
             tableBody.appendChild(emptyRow);
             return;
         }

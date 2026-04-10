@@ -59,7 +59,7 @@
     <div class="col-md-4">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-body">
-                <div class="text-muted small text-uppercase mb-1">Total Active Teams</div>
+                <div class="text-muted small text-uppercase mb-1">Total Teams</div>
                 <div class="h3 mb-0 fw-bold">{{ teams|length }}</div>
             </div>
         </div>
@@ -208,7 +208,7 @@
 </div>
 {% else %}
 <div class="alert alert-warning">
-    <i class="bi bi-exclamation-triangle me-1"></i>No active teams available for presentation.
+    <i class="bi bi-exclamation-triangle me-1"></i>No teams available for presentation.
 </div>
 {% endif %}
 
@@ -391,7 +391,7 @@ body.presentation-overtime .navbar {
         } else {
             document.body.classList.remove('presentation-overtime');
             statusElement.className = 'small mt-2 text-secondary fw-semibold';
-            statusElement.textContent = 'Paused (manual start)';
+            statusElement.textContent = 'Paused';
         }
 
         startButton.disabled = timerState.running;

@@ -66,9 +66,9 @@ def score_team(team_id):
         flash("Your judge profile is unavailable. Contact admin.", "danger")
         return redirect(url_for("public.logout"))
 
-    team = Team.query.options(joinedload(Team.project)).filter_by(id=team_id, is_active=True).first()
+    team = Team.query.options(joinedload(Team.project)).filter_by(id=team_id).first()
     if not team:
-        flash("Team not found or inactive.", "warning")
+        flash("Team not found.", "warning")
         return redirect(url_for("judge.dashboard"))
 
     mark_judge_online(judge_profile.id)
@@ -156,7 +156,7 @@ def score_team(team_id):
                 next_team_id = get_next_active_team_id(team.id)
                 if next_team_id:
                     return redirect(url_for("judge.score_team", team_id=next_team_id))
-                flash("No next active team found. Continue from the dashboard.", "info")
+                flash("No next team found. Continue from the dashboard.", "info")
 
             return redirect(url_for("judge.score_team", team_id=team.id))
         except ValueError as exc:

@@ -71,7 +71,7 @@ def get_judge_team_score_snapshot(judge_id, team_id):
 
 def get_judge_dashboard_rows(judge_id):
     teams = (
-        Team.query.filter(Team.is_active.is_(True))
+        Team.query
         .order_by(Team.sort_order.asc(), Team.id.asc())
         .all()
     )
@@ -113,7 +113,7 @@ def get_judge_dashboard_rows(judge_id):
 
 def get_adjacent_active_team_ids(current_team_id):
     teams = (
-        Team.query.filter(Team.is_active.is_(True))
+        Team.query
         .order_by(Team.sort_order.asc(), Team.id.asc())
         .all()
     )

@@ -68,6 +68,9 @@ def _redirect_to_role_dashboard(role):
 
 @public_bp.get("/")
 def home():
+    if current_user.is_authenticated and getattr(current_user, "role", None) == "judge":
+        return redirect(url_for("judge.dashboard"))
+
     return render_template("public/home.html")
 
 
@@ -434,7 +437,7 @@ def team_direct_login(token):
         flash("This team link has expired. Please login with Team ID and password.", "warning")
         return redirect(url_for("public.login", username=team_id_hint))
 
-    if not team or not team.is_active or not team.portal_login_id or not team.portal_password_hash:
+    if not team or not team.portal_login_id or not team.portal_password_hash:
         flash("Team account is not ready for login.", "warning")
         return redirect(url_for("public.login", username=team_id_hint))
 

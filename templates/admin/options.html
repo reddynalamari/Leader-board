@@ -21,15 +21,15 @@
     <div class="card-body p-4">
         <form method="post" action="{{ url_for('admin.update_presentation_time_limit_option') }}" class="row g-3 align-items-end" novalidate>
             <div class="col-md-4">
-                <label for="presentation_time_limit_seconds" class="form-label">Time Limit (Seconds)</label>
+                <label for="presentation_time_limit_minutes" class="form-label">Time Limit (Minutes)</label>
                 <input
                     type="number"
                     class="form-control"
-                    id="presentation_time_limit_seconds"
-                    name="presentation_time_limit_seconds"
-                    min="60"
-                    max="3600"
-                    value="{{ presentation_time_limit_seconds }}"
+                    id="presentation_time_limit_minutes"
+                    name="presentation_time_limit_minutes"
+                    min="1"
+                    max="60"
+                    value="{{ presentation_time_limit_minutes }}"
                     required>
             </div>
             <div class="col-md-4">

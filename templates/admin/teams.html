@@ -33,7 +33,6 @@
                         <th style="min-width: 240px;">Team</th>
                         <th style="min-width: 220px;">Project</th>
                         <th style="min-width: 210px;">Members</th>
-                        <th style="width: 120px;">Status</th>
                         <th style="min-width: 320px;">Team Portal Access</th>
                         <th class="pe-4" style="min-width: 210px;">Actions</th>
                     </tr>
@@ -70,13 +69,6 @@
                             </div>
                             {% else %}
                             <span class="text-muted small">No members</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if team.is_active %}
-                            <span class="badge text-bg-success">Active</span>
-                            {% else %}
-                            <span class="badge text-bg-secondary">Inactive</span>
                             {% endif %}
                         </td>
                         <td>
@@ -118,16 +110,13 @@
                                 {% endfor %}
                             </div>
                             {% else %}
-                            <span class="small text-muted">No active team links</span>
+                            <span class="small text-muted">No team links</span>
                             {% endif %}
                         </td>
                         <td class="pe-4">
                             <div class="d-flex flex-wrap gap-1 justify-content-start">
                                 <a class="btn btn-sm btn-outline-primary" href="{{ url_for('admin.edit_team', team_id=team.id) }}">Edit</a>
                                 <a class="btn btn-sm btn-outline-dark" href="{{ url_for('admin.manage_team_members', team_id=team.id) }}">Members</a>
-                                <form method="post" action="{{ url_for('admin.toggle_team_active', team_id=team.id) }}" class="mb-0">
-                                    <button type="submit" class="btn btn-sm btn-outline-warning">{{ 'Deactivate' if team.is_active else 'Activate' }}</button>
-                                </form>
                                 <form method="post" action="{{ url_for('admin.delete_team', team_id=team.id) }}" onsubmit="return confirm('Delete this team and related data?');" class="mb-0">
                                     <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
                                 </form>
@@ -136,7 +125,7 @@
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="7" class="text-center text-muted py-5">No teams found.</td>
+                        <td colspan="6" class="text-center text-muted py-5">No teams found.</td>
                     </tr>
                     {% endfor %}
                 </tbody>

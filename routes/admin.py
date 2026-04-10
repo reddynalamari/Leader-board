@@ -256,6 +256,7 @@ def manage_options():
     processes = ProcessOption.query.order_by(ProcessOption.name.asc()).all()
     scoring_definitions = get_category_definitions()
     presentation_time_limit_seconds = _get_presentation_time_limit_seconds()
+    presentation_time_limit_minutes = max(1, min(60, int((presentation_time_limit_seconds + 59) // 60)))
 
     return render_template(
         "admin/options.html",
@@ -265,6 +266,7 @@ def manage_options():
         processes=processes,
         scoring_definitions=scoring_definitions,
         presentation_time_limit_seconds=presentation_time_limit_seconds,
+        presentation_time_limit_minutes=presentation_time_limit_minutes,
     )
 
 
@@ -438,16 +440,18 @@ def update_scoring_options():
 @admin_bp.post("/options/presentation-time-limit")
 @role_required("admin")
 def update_presentation_time_limit_option():
-    raw_limit = (request.form.get("presentation_time_limit_seconds") or "").strip()
+    raw_limit_minutes = (request.form.get("presentation_time_limit_minutes") or "").strip()
     try:
-        time_limit_seconds = int(raw_limit)
+        time_limit_minutes = int(raw_limit_minutes)
     except (TypeError, ValueError):
-        flash("Presentation time limit must be a whole number of seconds.", "warning")
+        flash("Presentation time limit must be a whole number of minutes.", "warning")
         return redirect(url_for("admin.manage_options"))
 
-    if time_limit_seconds < 60 or time_limit_seconds > 3600:
-        flash("Presentation time limit must be between 60 and 3600 seconds.", "warning")
+    if time_limit_minutes < 1 or time_limit_minutes > 60:
+        flash("Presentation time limit must be between 1 and 60 minutes.", "warning")
         return redirect(url_for("admin.manage_options"))
+
+    time_limit_seconds = time_limit_minutes * 60
 
     try:
         _set_system_setting(PRESENTATION_TIME_LIMIT_KEY, str(time_limit_seconds))
@@ -566,7 +570,6 @@ def _get_active_teams_for_presentation():
             joinedload(Team.project),
             joinedload(Team.members),
         )
-        .filter(Team.is_active.is_(True))
         .order_by(Team.sort_order.asc(), Team.id.asc())
         .all()
     )
@@ -635,7 +638,6 @@ def _parse_team_form_payload(form_data):
         "repository_url": _validate_optional_url("Repository URL", form_data.get("repository_url", "")),
         "demo_url": _validate_optional_url("Demo URL", form_data.get("demo_url", "")),
         "notes_url": _validate_optional_url("Notes URL", form_data.get("notes_url", "")),
-        "is_active": form_data.get("is_active") == "on",
     }
 
 
@@ -689,7 +691,7 @@ def presentation_control():
     if selected_team_id:
         current_team = next((team for team in teams if team.id == selected_team_id), None)
         if current_team is None:
-            flash("Selected team is not available in the active presentation queue.", "warning")
+            flash("Selected team is not available in the presentation queue.", "warning")
 
     if current_team is None:
         current_team = _find_default_presentation_team(teams)
@@ -731,7 +733,9 @@ def presentation_timer_state():
             {
                 "ok": True,
                 **snapshot,
+                "current_team_id": current_team.id if current_team else None,
                 "current_team_name": current_team.team_name if current_team else None,
+                "next_team_id": next_pending_team.id if next_pending_team else None,
                 "next_team_name": next_pending_team.team_name if next_pending_team else None,
             }
         )
@@ -779,9 +783,9 @@ def control_presentation_timer():
 def mark_team_presentation_complete(team_id):
     now_utc = _utcnow()
     try:
-        team = Team.query.filter_by(id=team_id, is_active=True).first()
+        team = Team.query.filter_by(id=team_id).first()
         if not team:
-            flash("Team not found or inactive.", "warning")
+            flash("Team not found.", "warning")
             return redirect(url_for("admin.presentation_control"))
 
         timer_elapsed_seconds = _compute_timer_elapsed_seconds(_get_timer_state_payload(), now_utc=now_utc)
@@ -824,9 +828,9 @@ def mark_team_presentation_complete(team_id):
 @role_required("admin")
 def reopen_team_presentation(team_id):
     try:
-        team = Team.query.filter_by(id=team_id, is_active=True).first()
+        team = Team.query.filter_by(id=team_id).first()
         if not team:
-            flash("Team not found or inactive.", "warning")
+            flash("Team not found.", "warning")
             return redirect(url_for("admin.presentation_control"))
 
         team.presentation_completed = False
@@ -895,7 +899,7 @@ def create_team():
                 sort_order=int(max_sort_order) + 1,
                 process=payload["process"],
                 theme=payload["theme"],
-                is_active=payload["is_active"],
+                is_active=True,
             )
             team.project = Project(
                 project_title=payload["project_title"],
@@ -1023,8 +1027,8 @@ def create_team_access_link(team_id):
 
     try:
         team = Team.query.filter_by(id=team_id).first()
-        if not team or not team.is_active:
-            flash("Team not found or inactive.", "warning")
+        if not team:
+            flash("Team not found.", "warning")
             return redirect(url_for("admin.list_teams"))
 
         if not team.portal_login_id or not team.portal_password_hash:
@@ -1109,7 +1113,7 @@ def edit_team(team_id):
             team.team_name = payload["team_name"]
             team.process = payload["process"]
             team.theme = payload["theme"]
-            team.is_active = payload["is_active"]
+            team.is_active = True
 
             project = team.project
             if not project:
@@ -1175,14 +1179,16 @@ def toggle_team_active(team_id):
             flash("Team not found.", "warning")
             return redirect(url_for("admin.list_teams"))
 
-        team.is_active = not team.is_active
-        db.session.commit()
-        state = "activated" if team.is_active else "deactivated"
-        flash(f"Team {state} successfully.", "success")
+        if team.is_active:
+            flash("Team participation is always enabled.", "info")
+        else:
+            team.is_active = True
+            db.session.commit()
+            flash("Team participation enabled successfully.", "success")
     except SQLAlchemyError as exc:
         db.session.rollback()
         current_app.logger.error("Team activation toggle failed: %s", exc)
-        flash("Unable to update team status.", "danger")
+        flash("Unable to update team participation status.", "danger")
 
     return redirect(url_for("admin.list_teams"))
 

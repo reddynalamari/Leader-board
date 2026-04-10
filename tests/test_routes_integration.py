@@ -31,6 +31,42 @@ def test_access_control_and_not_found(client):
     assert not_found_response.status_code == 404
 
 
+def test_home_redirects_authenticated_judge_to_dashboard(app, client):
+    judge_username = _unique_name("judge_home")
+    judge_password = "judgepass123"
+
+    with app.app_context():
+        judge_user = User(
+            username=judge_username,
+            email=f"{judge_username}@example.com",
+            password_hash=generate_password_hash(judge_password),
+            role="judge",
+            is_active=True,
+        )
+        Judge(user=judge_user, display_name="Judge Home", is_active=True)
+        db.session.add(judge_user)
+        db.session.commit()
+        judge_user_id = judge_user.id
+
+    try:
+        login_response = client.post(
+            "/login",
+            data={"username": judge_username, "password": judge_password},
+            follow_redirects=False,
+        )
+        assert login_response.status_code == 302
+
+        response = client.get("/", follow_redirects=False)
+        assert response.status_code == 302
+        assert "/judge/dashboard" in (response.headers.get("Location") or "")
+    finally:
+        with app.app_context():
+            user = User.query.filter_by(id=judge_user_id).first()
+            if user:
+                db.session.delete(user)
+                db.session.commit()
+
+
 def test_admin_kill_switch_wipes_database_and_restores_defaults(app, admin_client):
     if os.getenv("RUN_DESTRUCTIVE_TESTS") != "1":
         pytest.skip("Destructive kill-switch test skipped by default. Set RUN_DESTRUCTIVE_TESTS=1 to enable.")
@@ -231,16 +267,9 @@ def test_admin_team_and_member_crud_flow(app, admin_client):
     )
     assert response_delete_member.status_code == 302
 
-    response_deactivate = admin_client.post(
-        f"/admin/teams/{team_id}/toggle-active",
-        follow_redirects=False,
-    )
-    assert response_deactivate.status_code == 302
-
     with app.app_context():
         team = Team.query.filter_by(id=team_id).first()
         assert team is not None
-        assert team.is_active is False
         assert TeamMember.query.filter_by(team_id=team_id).count() == 0
 
     response_delete_team = admin_client.post(
@@ -452,7 +481,7 @@ def test_admin_presentation_control_flow(app, admin_client):
 def test_admin_updates_presentation_time_limit_option(app, admin_client):
     response = admin_client.post(
         "/admin/options/presentation-time-limit",
-        data={"presentation_time_limit_seconds": "420"},
+        data={"presentation_time_limit_minutes": "7"},
         follow_redirects=False,
     )
     assert response.status_code == 302

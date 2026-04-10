@@ -13,11 +13,13 @@
 <div class="card border-0 shadow-sm mb-4">
 	<div class="card-body d-flex flex-wrap align-items-center justify-content-between gap-3">
 		<div>
-			<div class="small text-muted text-uppercase">Live Presentation Timer (Read Only)</div>
-			<div id="judge-presentation-timer" class="h4 mb-0 fw-bold">00:00</div>
-			<div id="judge-presentation-status" class="small text-muted">Loading...</div>
+			<div class="small text-muted text-uppercase">Current Presentation Focus</div>
+			<div class="fw-semibold" id="judge-presentation-state-text">Loading...</div>
 		</div>
-		<div class="small text-muted" id="judge-presentation-team-text">Current team: -</div>
+		<div class="d-flex gap-2 flex-wrap">
+			<a id="judge-current-team-link" class="btn btn-sm btn-primary disabled" href="#" aria-disabled="true">Open Current Team</a>
+			<a id="judge-next-team-link" class="btn btn-sm btn-outline-primary disabled" href="#" aria-disabled="true">Open Next Team</a>
+		</div>
 	</div>
 </div>
 
@@ -68,7 +70,7 @@
 			</tr>
 			{% else %}
 			<tr>
-				<td colspan="9" class="text-center text-muted">No active teams are available for scoring.</td>
+				<td colspan="9" class="text-center text-muted">No teams are available for scoring.</td>
 			</tr>
 			{% endfor %}
 		</tbody>
@@ -79,23 +81,28 @@
 (function () {
 	const heartbeatUrl = "{{ url_for('judge.heartbeat') }}";
 	const presentationStateUrl = "{{ url_for('admin.presentation_timer_state') }}";
-	const timerElement = document.getElementById('judge-presentation-timer');
-	const timerStatusElement = document.getElementById('judge-presentation-status');
-	const timerTeamElement = document.getElementById('judge-presentation-team-text');
+	const stateTextElement = document.getElementById('judge-presentation-state-text');
+	const currentTeamLink = document.getElementById('judge-current-team-link');
+	const nextTeamLink = document.getElementById('judge-next-team-link');
 
-	function twoDigits(value) {
-		return String(value).padStart(2, '0');
-	}
-
-	function formatTime(totalSeconds) {
-		const safeValue = Math.max(0, Number(totalSeconds || 0));
-		const hours = Math.floor(safeValue / 3600);
-		const minutes = Math.floor((safeValue % 3600) / 60);
-		const seconds = safeValue % 60;
-		if (hours > 0) {
-			return twoDigits(hours) + ':' + twoDigits(minutes) + ':' + twoDigits(seconds);
+	function applyTeamLink(linkElement, teamId, teamName) {
+		if (!linkElement) {
+			return;
 		}
-		return twoDigits(minutes) + ':' + twoDigits(seconds);
+
+		if (!teamId) {
+			linkElement.classList.add('disabled');
+			linkElement.setAttribute('aria-disabled', 'true');
+			linkElement.href = '#';
+			return;
+		}
+
+		linkElement.classList.remove('disabled');
+		linkElement.removeAttribute('aria-disabled');
+		linkElement.href = '/judge/teams/' + String(teamId) + '/score';
+		if (teamName) {
+			linkElement.title = String(teamName);
+		}
 	}
 
 	async function sendHeartbeat() {
@@ -111,8 +118,8 @@
 		}
 	}
 
-	async function refreshPresentationTimer() {
-		if (!timerElement || !timerStatusElement || !timerTeamElement) {
+	async function refreshPresentationFocus() {
+		if (!stateTextElement) {
 			return;
 		}
 
@@ -127,34 +134,22 @@
 				return;
 			}
 
-			const elapsedSeconds = Number(payload.elapsed_seconds || 0);
-			const timeLimitSeconds = Number(payload.time_limit_seconds || 300);
-			const overtimeSeconds = Math.max(0, elapsedSeconds - timeLimitSeconds);
-			timerElement.textContent = formatTime(elapsedSeconds);
-
-			if (overtimeSeconds > 0) {
-				timerStatusElement.className = 'small text-danger fw-semibold';
-				timerStatusElement.textContent = 'Overtime +' + formatTime(overtimeSeconds);
-			} else if (payload.running) {
-				timerStatusElement.className = 'small text-success fw-semibold';
-				timerStatusElement.textContent = 'Running';
-			} else {
-				timerStatusElement.className = 'small text-secondary fw-semibold';
-				timerStatusElement.textContent = 'Paused';
-			}
-
+			const runningText = payload.running ? 'Timer running' : 'Timer paused';
 			const currentTeamName = payload.current_team_name || '-';
 			const nextTeamName = payload.next_team_name || '-';
-			timerTeamElement.textContent = 'Current team: ' + currentTeamName + ' | Next team: ' + nextTeamName;
+			stateTextElement.textContent = 'Current: ' + currentTeamName + ' | Next: ' + nextTeamName + ' | ' + runningText;
+
+			applyTeamLink(currentTeamLink, payload.current_team_id, payload.current_team_name);
+			applyTeamLink(nextTeamLink, payload.next_team_id, payload.next_team_name);
 		} catch (error) {
 			// Ignore temporary polling errors.
 		}
 	}
 
 	sendHeartbeat();
-	refreshPresentationTimer();
+	refreshPresentationFocus();
 	setInterval(sendHeartbeat, 10000);
-	setInterval(refreshPresentationTimer, 2000);
+	setInterval(refreshPresentationFocus, 2000);
 })();
 </script>
 {% endblock %}

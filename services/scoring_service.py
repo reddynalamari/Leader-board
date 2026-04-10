@@ -42,7 +42,6 @@ def get_live_scoreboard_rows():
                 earliest_submission,
             )
             .outerjoin(Score, Score.team_id == Team.id)
-            .filter(Team.is_active.is_(True))
             .group_by(Team.id, Team.team_name, Team.process, Team.theme)
             .order_by(
                 total_score.desc(),

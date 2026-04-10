@@ -124,8 +124,45 @@
     data-previous-url="{{ url_for('judge.score_team', team_id=previous_team_id) if previous_team_id else '' }}"
     data-next-url="{{ url_for('judge.score_team', team_id=next_team_id) if next_team_id else '' }}"
     data-heartbeat-url="{{ url_for('judge.heartbeat') }}"
+    data-presentation-state-url="{{ url_for('admin.presentation_timer_state') }}"
+    data-current-team-id="{{ team.id }}"
     hidden>
 </div>
+
+<div id="judge-move-banner" class="judge-move-banner" aria-live="polite">
+    <div class="judge-move-banner-title">Presentation moved to another team</div>
+    <div id="judge-move-banner-text" class="small mb-2"></div>
+    <a id="judge-move-banner-link" href="#" class="btn btn-sm btn-light">Open Current Team</a>
+</div>
+
+<style>
+.judge-move-banner {
+    position: fixed;
+    top: 84px;
+    right: 16px;
+    max-width: 340px;
+    z-index: 1080;
+    background: #0d6efd;
+    color: #fff;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 24px rgba(13, 110, 253, 0.35);
+    padding: 0.85rem 0.95rem;
+    opacity: 0;
+    transform: translateX(120%);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    pointer-events: none;
+}
+
+.judge-move-banner.show {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+}
+
+.judge-move-banner-title {
+    font-weight: 700;
+}
+</style>
 
 <script>
 (function () {
@@ -135,6 +172,13 @@
     const previousTeamUrl = (navConfig && navConfig.dataset.previousUrl) || '';
     const nextTeamUrl = (navConfig && navConfig.dataset.nextUrl) || '';
     const heartbeatUrl = (navConfig && navConfig.dataset.heartbeatUrl) || '';
+    const presentationStateUrl = (navConfig && navConfig.dataset.presentationStateUrl) || '';
+    const currentTeamId = Number((navConfig && navConfig.dataset.currentTeamId) || '0');
+    const moveBanner = document.getElementById('judge-move-banner');
+    const moveBannerText = document.getElementById('judge-move-banner-text');
+    const moveBannerLink = document.getElementById('judge-move-banner-link');
+    let lastNotifiedTeamId = null;
+    let hideBannerTimer = null;
 
     function clampScoreInputValue(input) {
         const maxScore = Number(input.dataset.maxScore || input.max || '0');
@@ -212,8 +256,60 @@
         }
     }
 
+    function showMoveBanner(targetTeamId, targetTeamName) {
+        if (!moveBanner || !moveBannerText || !moveBannerLink || !targetTeamId) {
+            return;
+        }
+
+        moveBannerText.textContent = 'Admin started the timer for ' + String(targetTeamName || ('Team ' + targetTeamId)) + '. Please switch now.';
+        moveBannerLink.href = '/judge/teams/' + String(targetTeamId) + '/score';
+        moveBanner.classList.add('show');
+
+        if (hideBannerTimer) {
+            window.clearTimeout(hideBannerTimer);
+        }
+
+        hideBannerTimer = window.setTimeout(() => {
+            moveBanner.classList.remove('show');
+        }, 2500);
+    }
+
+    async function refreshPresentationGuidance() {
+        if (!presentationStateUrl || !Number.isFinite(currentTeamId) || currentTeamId <= 0) {
+            return;
+        }
+
+        try {
+            const response = await fetch(presentationStateUrl, { cache: 'no-store' });
+            if (!response.ok) {
+                return;
+            }
+
+            const payload = await response.json();
+            if (!payload || payload.ok === false) {
+                return;
+            }
+
+            const liveTeamId = Number(payload.current_team_id || 0);
+            if (!payload.running || liveTeamId <= 0 || liveTeamId === currentTeamId) {
+                return;
+            }
+
+            if (lastNotifiedTeamId === liveTeamId) {
+                return;
+            }
+
+            lastNotifiedTeamId = liveTeamId;
+            showMoveBanner(liveTeamId, payload.current_team_name);
+        } catch (error) {
+            // Ignore temporary polling errors.
+        }
+    }
+
     sendHeartbeat();
+    refreshPresentationGuidance();
     setInterval(sendHeartbeat, 10000);
+    setInterval(refreshPresentationGuidance, 2000);
 
     updateTotal();
 })();

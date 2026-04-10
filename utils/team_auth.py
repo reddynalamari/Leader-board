@@ -14,7 +14,7 @@ def get_logged_in_team():
     if not team_id:
         return None
 
-    team = Team.query.filter_by(id=team_id, is_active=True).first()
+    team = Team.query.filter_by(id=team_id).first()
     if not team:
         session.pop(TEAM_SESSION_KEY, None)
         return None
@@ -31,7 +31,7 @@ def logout_team():
 
 
 def authenticate_team(login_id, password):
-    team = Team.query.filter_by(portal_login_id=(login_id or "").strip(), is_active=True).first()
+    team = Team.query.filter_by(portal_login_id=(login_id or "").strip()).first()
     if not team or not team.portal_password_hash:
         return None
 
