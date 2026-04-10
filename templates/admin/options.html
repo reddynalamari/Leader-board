@@ -3,25 +3,30 @@
 {% block title %}Manage Options{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2 class="mb-0">Manage Options</h2>
-    <a class="btn btn-outline-secondary" href="{{ url_for('admin.dashboard') }}">Back to Dashboard</a>
+<div class="row align-items-center mb-4">
+    <div class="col-md-8">
+        <h2 class="mb-0 fw-bold text-dark"><i class="bi bi-sliders me-2 text-primary"></i>Manage Options</h2>
+        <p class="text-muted mt-1 mb-0">Tune scoring, manage theme/process options, and clean filtered score data safely.</p>
+    </div>
+    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+        <a class="btn btn-outline-secondary" href="{{ url_for('admin.dashboard') }}"><i class="bi bi-arrow-left me-1"></i>Dashboard</a>
+    </div>
 </div>
 
-<div class="card mb-4">
-    <div class="card-body">
-        <h3 class="h5 mb-3">Scoring Rules</h3>
-        <p class="text-muted small mb-3">
-            Configure each category percentage and maximum raw score. The total of all percentages must be 100.
-        </p>
+<div class="card border-0 shadow-sm rounded-4 mb-4" id="scoring-settings">
+    <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+        <h5 class="fw-bold mb-1"><i class="bi bi-list-check me-2 text-success"></i>Scoring Rules</h5>
+        <p class="text-muted small mb-0">Percentages across all categories must total 100.</p>
+    </div>
+    <div class="card-body p-4">
         <form method="post" action="{{ url_for('admin.update_scoring_options') }}" class="row g-3" novalidate>
             {% for item in scoring_definitions %}
-            <div class="col-12">
-                <div class="border rounded p-3">
-                    <div class="fw-semibold mb-2">{{ item.label }}</div>
+            <div class="col-md-6">
+                <div class="border rounded-3 p-3 h-100 bg-light-subtle">
+                    <div class="fw-semibold mb-3">{{ item.label }}</div>
                     <div class="row g-2">
-                        <div class="col-md-6">
-                            <label class="form-label" for="weight_{{ item.key }}">Weight %</label>
+                        <div class="col-6">
+                            <label class="form-label small" for="weight_{{ item.key }}">Weight %</label>
                             <input
                                 type="number"
                                 class="form-control"
@@ -32,8 +37,8 @@
                                 value="{{ '%.2f'|format(item.weight_percent) }}"
                                 required>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label" for="max_{{ item.key }}">Max Raw Score</label>
+                        <div class="col-6">
+                            <label class="form-label small" for="max_{{ item.key }}">Max Raw Score</label>
                             <input
                                 type="number"
                                 class="form-control"
@@ -48,53 +53,41 @@
                 </div>
             </div>
             {% endfor %}
-
-            <div class="col-12">
-                <button type="submit" class="btn btn-primary">Save Scoring Rules</button>
+            <div class="col-12 mt-2">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save Scoring Rules</button>
             </div>
         </form>
     </div>
 </div>
 
-<div class="card mb-4">
-    <div class="card-body">
-        <h3 class="h5 mb-3">Delete Scores</h3>
-        <p class="text-muted small mb-3">
-            You can delete all scores, scores for a single team, scores from one judge, or scores from many judges.
-            You can also combine team + judge filters.
-        </p>
+<div class="card border-0 shadow-sm rounded-4 mb-4">
+    <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+        <h5 class="fw-bold mb-1 text-danger"><i class="bi bi-trash3 me-2"></i>Delete Scores (Filtered Only)</h5>
+        <p class="text-muted small mb-0">For safety, at least one filter is required. Delete-all is disabled.</p>
+    </div>
+    <div class="card-body p-4">
         <form method="post" action="{{ url_for('admin.delete_scores') }}" class="row g-3" novalidate>
-            <div class="col-md-4">
+            <div class="col-lg-5">
                 <label for="team_id" class="form-label">Team Filter</label>
                 <select class="form-select" id="team_id" name="team_id">
-                    <option value="">No team filter</option>
+                    <option value="">Select team (optional)</option>
                     {% for team in teams %}
                     <option value="{{ team.id }}">{{ team.team_name }}</option>
                     {% endfor %}
                 </select>
             </div>
-
-            <div class="col-md-8">
+            <div class="col-lg-7">
                 <label for="judge_ids" class="form-label">Judge Filter (one or many)</label>
                 <select class="form-select" id="judge_ids" name="judge_ids" multiple size="4">
                     {% for judge in judges %}
                     <option value="{{ judge.id }}">{{ judge.display_name }}</option>
                     {% endfor %}
                 </select>
+                <div class="form-text">Hold Ctrl/Cmd to select multiple judges.</div>
             </div>
-
             <div class="col-12">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="delete_all" name="delete_all">
-                    <label class="form-check-label" for="delete_all">
-                        Delete all scores (ignores team/judge filters)
-                    </label>
-                </div>
-            </div>
-
-            <div class="col-12">
-                <button type="submit" class="btn btn-danger" onclick="return confirm('Delete selected score data?');">
-                    Delete Scores
+                <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Delete selected score data?');">
+                    <i class="bi bi-trash me-1"></i>Delete Filtered Scores
                 </button>
             </div>
         </form>
@@ -103,16 +96,17 @@
 
 <div class="row g-4">
     <div class="col-lg-6">
-        <div class="card h-100">
-            <div class="card-body">
-                <h3 class="h5 mb-3">Theme Options</h3>
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+                <h5 class="fw-bold mb-0"><i class="bi bi-palette me-2 text-primary"></i>Theme Options</h5>
+            </div>
+            <div class="card-body p-4">
                 <form method="post" action="{{ url_for('admin.add_theme_option') }}" class="d-flex gap-2 mb-3">
                     <input type="text" class="form-control" name="theme_name" placeholder="Add theme" required>
                     <button type="submit" class="btn btn-primary">Add</button>
                 </form>
-
                 <div class="table-responsive">
-                    <table class="table table-sm table-bordered align-middle mb-0">
+                    <table class="table table-hover align-middle mb-0">
                         <thead class="table-light">
                             <tr>
                                 <th>Theme</th>
@@ -124,14 +118,14 @@
                             <tr>
                                 <td>{{ theme.name }}</td>
                                 <td>
-                                    <form method="post" action="{{ url_for('admin.delete_theme_option', theme_id=theme.id) }}" onsubmit="return confirm('Delete this theme option?');">
+                                    <form method="post" action="{{ url_for('admin.delete_theme_option', theme_id=theme.id) }}" onsubmit="return confirm('Delete this theme option?');" class="mb-0">
                                         <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
                                     </form>
                                 </td>
                             </tr>
                             {% else %}
                             <tr>
-                                <td colspan="2" class="text-center text-muted">No themes added yet.</td>
+                                <td colspan="2" class="text-center text-muted py-4">No themes added yet.</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -142,16 +136,17 @@
     </div>
 
     <div class="col-lg-6">
-        <div class="card h-100">
-            <div class="card-body">
-                <h3 class="h5 mb-3">Process Options</h3>
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+                <h5 class="fw-bold mb-0"><i class="bi bi-diagram-3 me-2 text-secondary"></i>Process Options</h5>
+            </div>
+            <div class="card-body p-4">
                 <form method="post" action="{{ url_for('admin.add_process_option') }}" class="d-flex gap-2 mb-3">
                     <input type="text" class="form-control" name="process_name" placeholder="Add process" required>
                     <button type="submit" class="btn btn-primary">Add</button>
                 </form>
-
                 <div class="table-responsive">
-                    <table class="table table-sm table-bordered align-middle mb-0">
+                    <table class="table table-hover align-middle mb-0">
                         <thead class="table-light">
                             <tr>
                                 <th>Process</th>
@@ -163,14 +158,14 @@
                             <tr>
                                 <td>{{ process.name }}</td>
                                 <td>
-                                    <form method="post" action="{{ url_for('admin.delete_process_option', process_id=process.id) }}" onsubmit="return confirm('Delete this process option?');">
+                                    <form method="post" action="{{ url_for('admin.delete_process_option', process_id=process.id) }}" onsubmit="return confirm('Delete this process option?');" class="mb-0">
                                         <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
                                     </form>
                                 </td>
                             </tr>
                             {% else %}
                             <tr>
-                                <td colspan="2" class="text-center text-muted">No processes added yet.</td>
+                                <td colspan="2" class="text-center text-muted py-4">No processes added yet.</td>
                             </tr>
                             {% endfor %}
                         </tbody>

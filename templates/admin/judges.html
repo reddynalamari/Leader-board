@@ -3,203 +3,211 @@
 {% block title %}Manage Judges{% endblock %}
 
 {% block content %}
-<div class="row align-items-center mb-4">
-    <div class="col-md-8">
-        <h2 class="mb-0 fw-bold text-dark"><i class="bi bi-person-badge me-2 text-primary"></i> Manage Judges</h2>
-        <p class="text-muted mt-1">Add evaluators, manage their access links, and monitor login requests.</p>
-    </div>
-    <div class="col-md-4 text-md-end mt-3 mt-md-0">
-        <a class="btn btn-outline-secondary rounded-pill px-4" href="{{ url_for('admin.dashboard') }}">
-            <i class="bi bi-arrow-left me-1"></i> Dashboard
-        </a>
-    </div>
-</div>
-
-<div class="row g-4 mb-4">
-    <div class="col-xl-4 col-lg-5">
-        <!-- Add Judge Card -->
-        <div class="card border-0 shadow-sm rounded-4 h-100">
-            <div class="card-header bg-white border-0 pt-4 pb-0 px-4">
-                <h5 class="fw-bold mb-0"><i class="bi bi-person-plus-fill me-2 text-success"></i> Add New Judge</h5>
-            </div>
-            <div class="card-body px-4 py-4">
-                <form method="post" class="needs-validation" novalidate>
-                    <div class="mb-3">
-                        <label for="username" class="form-label fw-medium text-secondary small text-uppercase">Username</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-at text-muted"></i></span>
-                            <input type="text" id="username" name="username" class="form-control border-start-0 ps-0" placeholder="e.g. jsmith" pattern="[a-z0-9_.-]{3,80}" required>
-                        </div>
-                        <div class="form-text text-muted small">Login ID for the judge.</div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="display_name" class="form-label fw-medium text-secondary small text-uppercase">Display Name</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-person-lines-fill text-muted"></i></span>
-                            <input type="text" id="display_name" name="display_name" class="form-control border-start-0 ps-0" placeholder="John Smith" required>
-                        </div>
-                    </div>
-                    <div class="mb-4">
-                        <label for="password" class="form-label fw-medium text-secondary small text-uppercase">Password</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-key-fill text-muted"></i></span>
-                            <input type="password" id="password" name="password" class="form-control border-start-0 ps-0" placeholder="Min. 8 characters" minlength="8" required>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-primary w-100 py-2 rounded-3 shadow-sm fw-medium">
-                        <i class="bi bi-plus-circle me-1"></i> Create Judge Profile
-                    </button>
-                </form>
-            </div>
+<div class="judge-shell">
+    <div class="row align-items-center mb-4">
+        <div class="col-md-8">
+            <h2 class="mb-0 fw-bold text-dark"><i class="bi bi-person-badge me-2 text-primary"></i>Manage Judges</h2>
+            <p class="text-muted mt-1 mb-0">Add evaluators, manage access links, and monitor realtime login requests.</p>
+        </div>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+            <a class="btn btn-outline-secondary rounded-pill px-4" href="{{ url_for('admin.dashboard') }}">
+                <i class="bi bi-arrow-left me-1"></i>Dashboard
+            </a>
         </div>
     </div>
-    
-    <div class="col-xl-8 col-lg-7">
-        <!-- Existing Judges Table -->
-        <div class="card border-0 shadow-sm rounded-4 h-100">
-            <div class="card-header bg-white border-0 pt-4 pb-3 px-4 d-flex justify-content-between align-items-center">
-                <h5 class="fw-bold mb-0"><i class="bi bi-people-fill me-2 text-primary"></i> Registered Judges</h5>
-                <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2 fw-medium border border-primary border-opacity-25">{{ judges|length }} Total</span>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light text-secondary small text-uppercase">
-                            <tr>
-                                <th class="ps-4">Judge</th>
-                                <th style="min-width: 250px;">Direct Link & Access</th>
-                                <th style="min-width: 220px;">Security</th>
-                                <th class="pe-4 text-end">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody class="border-top-0">
-                            {% for user, judge in judges %}
-                            <tr>
-                                <td class="ps-4 py-3">
-                                    <div class="d-flex align-items-center">
-                                        <div class="position-relative me-3">
-                                            <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center text-primary fw-bold" style="width: 45px; height: 45px; font-size: 1.1rem;">
-                                                {{ judge.display_name[0]|upper }}
-                                            </div>
-                                            {% set is_online = judge_online_map.get(judge.id, False) %}
-                                            <span class="position-absolute bottom-0 end-0 p-1 rounded-circle badge border border-2 border-white {% if is_online %}bg-success{% else %}bg-secondary{% endif %}" title="{% if is_online %}Online{% else %}Offline{% endif %}">
-                                                <span class="visually-hidden">Status</span>
-                                            </span>
-                                        </div>
-                                        <div>
-                                            <h6 class="mb-0 fw-semibold text-dark">{{ judge.display_name }}</h6>
-                                            <p class="mb-0 text-muted small"><i class="bi bi-at"></i>{{ user.username }}</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="py-3">
-                                    <!-- Link Actions -->
-                                    <form method="post" action="{{ url_for('admin.create_judge_direct_link', user_id=user.id) }}" class="d-flex gap-2 mb-2">
-                                        <div class="input-group input-group-sm rounded-pill overflow-hidden border">
-                                            <input type="number" class="form-control border-0 shadow-none text-center px-1" style="max-width: 70px" name="lifespan_minutes" min="1" max="1440" value="30" required title="Lifespan (mins)">
-                                            <span class="input-group-text bg-light border-0 text-muted small px-1">min</span>
-                                            <button type="submit" class="btn btn-light border-0 border-start text-primary fw-medium" title="Generate Link">Gen <i class="bi bi-link-45deg"></i></button>
-                                        </div>
-                                    </form>
 
-                                    {% set links = active_links_by_judge.get(judge.id, []) %}
-                                    {% if links %}
-                                        <div class="d-flex flex-column gap-1">
-                                        {% for link in links %}
-                                            <div class="d-flex justify-content-between align-items-center bg-light border rounded px-2 py-1 small">
-                                                <a href="{{ url_for('public.judge_direct_login', token=link.token, _external=True) }}" target="_blank" class="text-decoration-none text-truncate d-inline-block me-2" style="max-width: 120px;" title="Open Direct Link">Open <i class="bi bi-box-arrow-up-right"></i></a>
-                                                <form method="post" action="{{ url_for('admin.revoke_judge_direct_link', link_id=link.id) }}" onsubmit="return confirm('Revoke this direct login link?');" class="m-0">
-                                                    <button type="submit" class="btn btn-link text-danger p-0 m-0 pe-1" title="Revoke Link"><i class="bi bi-x-circle-fill"></i></button>
+    <div class="row g-4 mb-4">
+        <div class="col-xl-4">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+                    <h5 class="fw-bold mb-0"><i class="bi bi-person-plus-fill me-2 text-success"></i>Add New Judge</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" novalidate>
+                        <div class="mb-3">
+                            <label for="username" class="form-label fw-semibold small text-uppercase text-secondary">Username</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="bi bi-at"></i></span>
+                                <input
+                                    type="text"
+                                    id="username"
+                                    name="username"
+                                    class="form-control"
+                                    placeholder="e.g. jsmith"
+                                    pattern="[a-z0-9_.-]{3,80}"
+                                    required>
+                            </div>
+                            <div class="form-text">Login ID for this judge.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="display_name" class="form-label fw-semibold small text-uppercase text-secondary">Display Name</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="bi bi-person-vcard"></i></span>
+                                <input type="text" id="display_name" name="display_name" class="form-control" placeholder="John Smith" required>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="password" class="form-label fw-semibold small text-uppercase text-secondary">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="bi bi-key"></i></span>
+                                <input type="password" id="password" name="password" class="form-control" placeholder="Min. 8 characters" minlength="8" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 fw-semibold py-2">
+                            <i class="bi bi-plus-circle me-1"></i>Create Judge Profile
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-8">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-header bg-white border-0 pt-4 pb-3 px-4 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold mb-0"><i class="bi bi-people-fill me-2 text-primary"></i>Registered Judges</h5>
+                    <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2 border border-primary-subtle">{{ judges|length }} Total</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light text-uppercase small">
+                                <tr>
+                                    <th class="ps-4">Judge</th>
+                                    <th style="min-width: 300px;">Direct Link & Access</th>
+                                    <th style="min-width: 240px;">Security</th>
+                                    <th class="pe-4 text-end" style="width: 90px;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user, judge in judges %}
+                                {% set is_online = judge_online_map.get(judge.id, False) %}
+                                <tr>
+                                    <td class="ps-4 py-3">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="judge-avatar">{{ judge.display_name[0]|upper }}</div>
+                                            <div>
+                                                <div class="d-flex align-items-center gap-2 mb-1">
+                                                    <h6 class="mb-0 fw-semibold">{{ judge.display_name }}</h6>
+                                                    <span
+                                                        class="judge-status-dot {% if is_online %}judge-status-online{% else %}judge-status-offline{% endif %}"
+                                                        data-judge-id="{{ judge.id }}"
+                                                        title="{% if is_online %}Online{% else %}Offline{% endif %}">
+                                                    </span>
+                                                </div>
+                                                <div class="small text-muted"><i class="bi bi-at me-1"></i>{{ user.username }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-3">
+                                        <form method="post" action="{{ url_for('admin.create_judge_direct_link', user_id=user.id) }}" class="d-flex gap-2 align-items-center mb-2">
+                                            <div class="input-group input-group-sm access-lifespan-input">
+                                                <input type="number" class="form-control" name="lifespan_minutes" min="1" max="1440" value="30" required>
+                                                <span class="input-group-text">min</span>
+                                            </div>
+                                            <button type="submit" class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-link-45deg"></i> Generate
+                                            </button>
+                                        </form>
+
+                                        {% set links = active_links_by_judge.get(judge.id, []) %}
+                                        {% if links %}
+                                        <div class="d-flex flex-column gap-2">
+                                            {% for link in links %}
+                                            <div class="access-link-box">
+                                                <a
+                                                    href="{{ url_for('public.judge_direct_login', token=link.token, _external=True) }}"
+                                                    target="_blank"
+                                                    class="text-decoration-none text-truncate">
+                                                    <i class="bi bi-box-arrow-up-right me-1"></i>Open Link
+                                                </a>
+                                                <span class="text-muted small">Expires {{ link.expires_at.strftime('%Y-%m-%d %H:%M UTC') }}</span>
+                                                <form method="post" action="{{ url_for('admin.revoke_judge_direct_link', link_id=link.id) }}" onsubmit="return confirm('Revoke this direct login link?');" class="mb-0">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">Revoke</button>
                                                 </form>
                                             </div>
-                                        {% endfor %}
+                                            {% endfor %}
                                         </div>
-                                    {% else %}
-                                        <span class="small text-muted fst-italic"><i class="bi bi-info-circle me-1"></i>No links</span>
-                                    {% endif %}
-                                </td>
-                                <td class="py-3">
-                                    <form method="post" action="{{ url_for('admin.update_judge_password', user_id=user.id) }}">
-                                        <div class="input-group input-group-sm rounded-pill overflow-hidden border">
-                                            <input type="password" class="form-control border-0 shadow-none ps-3" name="new_password" placeholder="New Password..." minlength="8" required>
-                                            <button type="submit" class="btn btn-light border-0 border-start text-secondary"><i class="bi bi-check2"></i></button>
-                                        </div>
-                                    </form>
-                                </td>
-                                <td class="pe-4 py-3 text-end">
-                                    <form method="post" action="{{ url_for('admin.delete_judge', user_id=user.id) }}" onsubmit="return confirm('Are you sure you want to permanently remove this judge?');">
-                                        <button type="submit" class="btn btn-outline-danger btn-sm rounded-circle p-2 d-flex align-items-center justify-content-center mx-auto shadow-sm" style="width: 32px; height: 32px;" title="Delete Judge">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                            {% else %}
-                            <tr>
-                                <td colspan="4" class="text-center text-muted py-5">
-                                    <div class="my-3">
-                                        <i class="bi bi-person-x display-4 text-secondary opacity-50 mb-3 block"></i>
-                                        <p class="mb-0">No judges found. Add one to get started.</p>
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                                        {% else %}
+                                        <span class="small text-muted"><i class="bi bi-info-circle me-1"></i>No links</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="py-3">
+                                        <form method="post" action="{{ url_for('admin.update_judge_password', user_id=user.id) }}">
+                                            <div class="input-group input-group-sm">
+                                                <input type="password" class="form-control" name="new_password" placeholder="New Password..." minlength="8" required>
+                                                <button type="submit" class="btn btn-outline-secondary"><i class="bi bi-check2"></i></button>
+                                            </div>
+                                        </form>
+                                    </td>
+                                    <td class="pe-4 py-3 text-end">
+                                        <form method="post" action="{{ url_for('admin.delete_judge', user_id=user.id) }}" onsubmit="return confirm('Delete this judge?');" class="mb-0">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-circle" title="Delete Judge">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted py-5">No judges found.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<div id="pending-login-requests" class="card border-0 shadow-sm rounded-4 mb-5">
-    <div class="card-header bg-white border-0 pt-4 pb-3 px-4 d-flex justify-content-between align-items-center">
-        <h5 class="fw-bold text-dark mb-0"><i class="bi bi-shield-lock-fill me-2 text-warning"></i> Access Requests</h5>
-        <span class="badge bg-warning text-dark rounded-pill px-3 py-2 fw-semibold" id="pending-request-count"><i class="bi bi-bell-fill me-1"></i> {{ pending_login_requests|length }} Pending</span>
-    </div>
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light text-secondary small text-uppercase">
-                    <tr>
-                        <th class="ps-4">Req #</th>
-                        <th>User & ID</th>
-                        <th>Device Identity</th>
-                        <th>Time Requested</th>
-                        <th class="pe-4 text-end">Action</th>
-                    </tr>
-                </thead>
-                <tbody id="pending-login-requests-body" class="border-top-0">
-                    {% for login_request, judge, user in pending_login_requests %}
-                    <tr>
-                        <td class="ps-4 text-muted fw-medium py-3">#{{ login_request.id }}</td>
-                        <td class="py-3">
-                            <span class="fw-semibold text-dark">{{ judge.display_name }}</span><br>
-                            <span class="text-muted small"><i class="bi bi-at"></i>{{ user.username }}</span>
-                        </td>
-                        <td class="py-3"><span class="badge bg-light text-dark border font-monospace">{{ login_request.requested_login or 'Unknown' }}</span></td>
-                        <td class="py-3 text-muted small"><i class="bi bi-clock me-1"></i>{{ login_request.created_at.strftime('%b %d, %H:%M') if login_request.created_at else '-' }}</td>
-                        <td class="pe-4 py-3 text-end">
-                            <div class="d-flex justify-content-end gap-2">
-                                <form method="post" action="{{ url_for('admin.approve_login_request', request_id=login_request.id) }}">
-                                    <button type="submit" class="btn btn-sm btn-success rounded-pill px-3 shadow-sm"><i class="bi bi-check2-circle me-1"></i> Approve</button>
-                                </form>
-                                <form method="post" action="{{ url_for('admin.reject_login_request', request_id=login_request.id) }}">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3"><i class="bi bi-x-circle me-1"></i> Deny</button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="5" class="text-center text-muted py-5" id="no-requests-row">
-                            <i class="bi bi-inbox text-secondary opacity-50 display-6 d-block mb-3"></i>
-                            Queue is empty. No pending login requests.
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <div id="pending-login-requests" class="card border-0 shadow-sm rounded-4 mb-5">
+        <div class="card-header bg-white border-0 pt-4 pb-3 px-4 d-flex justify-content-between align-items-center">
+            <h5 class="fw-bold text-dark mb-0"><i class="bi bi-shield-lock-fill me-2 text-warning"></i>Access Requests</h5>
+            <span class="badge bg-warning text-dark rounded-pill px-3 py-2 fw-semibold" id="pending-request-count">{{ pending_login_requests|length }}</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light text-uppercase small">
+                        <tr>
+                            <th class="ps-4" style="width: 90px;">Req #</th>
+                            <th>User & ID</th>
+                            <th>Device Identity</th>
+                            <th>Time Requested</th>
+                            <th class="pe-4 text-end" style="width: 210px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pending-login-requests-body">
+                        {% for login_request, judge, user in pending_login_requests %}
+                        <tr>
+                            <td class="ps-4">#{{ login_request.id }}</td>
+                            <td>
+                                <div class="fw-semibold text-dark">{{ judge.display_name }}</div>
+                                <div class="small text-muted"><i class="bi bi-at me-1"></i>{{ user.username }}</div>
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-dark border font-monospace">{{ login_request.requested_login or '-' }}</span>
+                            </td>
+                            <td class="text-muted small">{{ login_request.created_at.strftime('%Y-%m-%d %H:%M:%S UTC') if login_request.created_at else '-' }}</td>
+                            <td class="pe-4">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <form method="post" action="{{ url_for('admin.approve_login_request', request_id=login_request.id) }}">
+                                        <button type="submit" class="btn btn-sm btn-success"><i class="bi bi-check2-circle me-1"></i>Approve</button>
+                                    </form>
+                                    <form method="post" action="{{ url_for('admin.reject_login_request', request_id=login_request.id) }}">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-x-circle me-1"></i>Deny</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-5">No pending login requests.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
@@ -239,8 +247,9 @@
 
     function createActionCell(requestId) {
         const actionCell = document.createElement('td');
+        actionCell.className = 'pe-4';
         const actionsContainer = document.createElement('div');
-        actionsContainer.className = 'd-flex gap-1 flex-wrap';
+        actionsContainer.className = 'd-flex justify-content-end gap-2';
 
         const approveForm = document.createElement('form');
         approveForm.method = 'post';
@@ -249,7 +258,10 @@
         const approveButton = document.createElement('button');
         approveButton.type = 'submit';
         approveButton.className = 'btn btn-sm btn-success';
-        approveButton.textContent = 'Approve';
+        const approveIcon = document.createElement('i');
+        approveIcon.className = 'bi bi-check2-circle me-1';
+        approveButton.appendChild(approveIcon);
+        approveButton.appendChild(document.createTextNode('Approve'));
         approveForm.appendChild(approveButton);
 
         const rejectForm = document.createElement('form');
@@ -259,7 +271,10 @@
         const rejectButton = document.createElement('button');
         rejectButton.type = 'submit';
         rejectButton.className = 'btn btn-sm btn-outline-danger';
-        rejectButton.textContent = 'Reject';
+        const rejectIcon = document.createElement('i');
+        rejectIcon.className = 'bi bi-x-circle me-1';
+        rejectButton.appendChild(rejectIcon);
+        rejectButton.appendChild(document.createTextNode('Deny'));
         rejectForm.appendChild(rejectButton);
 
         actionsContainer.appendChild(approveForm);
@@ -274,8 +289,8 @@
         if (!items || items.length === 0) {
             const emptyRow = document.createElement('tr');
             const emptyCell = document.createElement('td');
-            emptyCell.colSpan = 6;
-            emptyCell.className = 'text-center text-muted';
+            emptyCell.colSpan = 5;
+            emptyCell.className = 'text-center text-muted py-5';
             emptyCell.textContent = 'No pending login requests.';
             emptyRow.appendChild(emptyCell);
             tableBody.appendChild(emptyRow);
@@ -286,22 +301,35 @@
             const row = document.createElement('tr');
 
             const requestIdCell = document.createElement('td');
+            requestIdCell.className = 'ps-4';
             requestIdCell.textContent = String(item.request_id);
             row.appendChild(requestIdCell);
 
-            const judgeCell = document.createElement('td');
-            judgeCell.textContent = String(item.judge_name || '-');
-            row.appendChild(judgeCell);
+            const userCell = document.createElement('td');
+            const userName = document.createElement('div');
+            userName.className = 'fw-semibold text-dark';
+            userName.textContent = String(item.judge_name || '-');
 
-            const loginKeyCell = document.createElement('td');
-            loginKeyCell.textContent = String(item.login_key || '-');
-            row.appendChild(loginKeyCell);
+            const userLogin = document.createElement('div');
+            userLogin.className = 'small text-muted';
+            const loginIcon = document.createElement('i');
+            loginIcon.className = 'bi bi-at me-1';
+            userLogin.appendChild(loginIcon);
+            userLogin.appendChild(document.createTextNode(String(item.login_key || '-')));
+
+            userCell.appendChild(userName);
+            userCell.appendChild(userLogin);
+            row.appendChild(userCell);
 
             const requestedAsCell = document.createElement('td');
-            requestedAsCell.textContent = String(item.requested_login || '-');
+            const requestedAsBadge = document.createElement('span');
+            requestedAsBadge.className = 'badge bg-light text-dark border font-monospace';
+            requestedAsBadge.textContent = String(item.requested_login || '-');
+            requestedAsCell.appendChild(requestedAsBadge);
             row.appendChild(requestedAsCell);
 
             const requestedAtCell = document.createElement('td');
+            requestedAtCell.className = 'text-muted small';
             requestedAtCell.textContent = formatUtc(item.created_at);
             row.appendChild(requestedAtCell);
 
@@ -316,7 +344,7 @@
     });
 
     function updateJudgePresence(onlineMap) {
-        const statusDots = document.querySelectorAll('[data-judge-id].judge-status-dot');
+        const statusDots = document.querySelectorAll('.judge-status-dot[data-judge-id]');
         statusDots.forEach((dot) => {
             const judgeId = String(dot.dataset.judgeId || '');
             const isOnline = Boolean(onlineMap && onlineMap[judgeId]);
@@ -345,7 +373,71 @@
     }
 
     refreshJudgePresence();
-    setInterval(refreshJudgePresence, 5000);
+    setInterval(refreshJudgePresence, 3000);
 })();
 </script>
+
+<style>
+.judge-shell .table > :not(caption) > * > * {
+    vertical-align: middle;
+}
+
+.judge-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: #0d6efd;
+    background: rgba(13, 110, 253, 0.12);
+    flex-shrink: 0;
+}
+
+.judge-status-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.judge-status-online {
+    background: #20c997;
+    box-shadow: 0 0 0 0 rgba(32, 201, 151, 0.8);
+    animation: judgePulseOnline 1.5s infinite;
+}
+
+.judge-status-offline {
+    background: #dc3545;
+    box-shadow: 0 0 10px rgba(220, 53, 69, 0.55);
+}
+
+.access-lifespan-input {
+    max-width: 140px;
+}
+
+.access-link-box {
+    display: grid;
+    grid-template-columns: minmax(100px, 1fr) auto auto;
+    gap: 0.5rem;
+    align-items: center;
+    padding: 0.4rem 0.5rem;
+    border: 1px solid #e9ecef;
+    border-radius: 0.5rem;
+    background: #f8f9fa;
+}
+
+@keyframes judgePulseOnline {
+    0% {
+        box-shadow: 0 0 0 0 rgba(32, 201, 151, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 7px rgba(32, 201, 151, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(32, 201, 151, 0);
+    }
+}
+</style>
 {% endblock %}

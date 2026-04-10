@@ -5,7 +5,7 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
 	<h2 class="mb-0">Judge Dashboard</h2>
-	<span class="text-muted">Welcome, {{ judge.username }}</span>
+	<span class="text-muted">Welcome, {{ judge_display_name or judge.username }}</span>
 </div>
 
 <p class="text-muted">Select a team to score or edit your previous scores.</p>

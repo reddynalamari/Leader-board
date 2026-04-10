@@ -49,6 +49,7 @@ def dashboard():
     return render_template(
         "judge/dashboard.html",
         judge=current_user,
+        judge_display_name=judge_profile.display_name,
         teams=teams,
         category_count=CATEGORY_COUNT,
     )

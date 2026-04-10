@@ -216,7 +216,6 @@ def delete_process_option(process_id):
 @admin_bp.post("/options/scores/delete")
 @role_required("admin")
 def delete_scores():
-    delete_all = request.form.get("delete_all") == "on"
     team_id_raw = request.form.get("team_id", "").strip()
     judge_ids_raw = request.form.getlist("judge_ids")
 
@@ -231,23 +230,22 @@ def delete_scores():
         query = Score.query
         filters_applied = []
 
-        if not delete_all:
-            if team_id_raw and team_id_raw != "all":
-                try:
-                    team_id = int(team_id_raw)
-                    query = query.filter(Score.team_id == team_id)
-                    filters_applied.append("team")
-                except ValueError:
-                    flash("Invalid team selected for score deletion.", "warning")
-                    return redirect(url_for("admin.manage_options"))
-
-            if judge_ids:
-                query = query.filter(Score.judge_id.in_(judge_ids))
-                filters_applied.append("judges")
-
-            if not filters_applied:
-                flash("Select delete all, a team, or one or more judges.", "warning")
+        if team_id_raw and team_id_raw != "all":
+            try:
+                team_id = int(team_id_raw)
+                query = query.filter(Score.team_id == team_id)
+                filters_applied.append("team")
+            except ValueError:
+                flash("Invalid team selected for score deletion.", "warning")
                 return redirect(url_for("admin.manage_options"))
+
+        if judge_ids:
+            query = query.filter(Score.judge_id.in_(judge_ids))
+            filters_applied.append("judges")
+
+        if not filters_applied:
+            flash("Select at least one filter: team or judge.", "warning")
+            return redirect(url_for("admin.manage_options"))
 
         deleted_count = query.delete(synchronize_session=False)
 
@@ -258,7 +256,6 @@ def delete_scores():
                 entity_type="scores",
                 entity_id=None,
                 old_data={
-                    "delete_all": delete_all,
                     "team_id": team_id_raw if team_id_raw else None,
                     "judge_ids": judge_ids,
                 },

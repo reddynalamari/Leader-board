@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, timezone
+import os
 import time
 import uuid
 
@@ -30,6 +31,9 @@ def test_access_control_and_not_found(client):
 
 
 def test_admin_kill_switch_wipes_database_and_restores_defaults(app, admin_client):
+    if os.getenv("RUN_DESTRUCTIVE_TESTS") != "1":
+        pytest.skip("Destructive kill-switch test skipped by default. Set RUN_DESTRUCTIVE_TESTS=1 to enable.")
+
     admin_password = app.config.get("ADMIN_PASSWORD")
     if not admin_password:
         pytest.skip("ADMIN_PASSWORD is required to validate kill switch flow.")
