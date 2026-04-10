@@ -392,6 +392,58 @@ def _get_theme_and_process_names():
     return theme_names, process_names
 
 
+def _get_active_teams_for_presentation():
+    return (
+        Team.query.options(
+            joinedload(Team.project),
+            joinedload(Team.members),
+        )
+        .filter(Team.is_active.is_(True))
+        .order_by(Team.sort_order.asc(), Team.id.asc())
+        .all()
+    )
+
+
+def _find_default_presentation_team(teams):
+    for team in teams:
+        if not team.presentation_completed:
+            return team
+
+    return teams[0] if teams else None
+
+
+def _find_adjacent_team_ids(teams, current_team_id):
+    if not current_team_id:
+        return None, None
+
+    team_ids = [team.id for team in teams]
+    if current_team_id not in team_ids:
+        return None, None
+
+    current_index = team_ids.index(current_team_id)
+    previous_team_id = team_ids[current_index - 1] if current_index > 0 else None
+    next_team_id = team_ids[current_index + 1] if current_index + 1 < len(team_ids) else None
+    return previous_team_id, next_team_id
+
+
+def _find_next_pending_team(teams, current_team_id):
+    if not teams:
+        return None
+
+    team_ids = [team.id for team in teams]
+    current_index = team_ids.index(current_team_id) if current_team_id in team_ids else -1
+
+    for team in teams[current_index + 1 :]:
+        if not team.presentation_completed:
+            return team
+
+    for team in teams:
+        if not team.presentation_completed:
+            return team
+
+    return None
+
+
 def _parse_team_form_payload(form_data):
     team_name = form_data.get("team_name", "").strip()
     process = form_data.get("process", "").strip()
@@ -445,6 +497,126 @@ def list_teams():
         active_team_links_by_team=active_team_links_by_team,
         now_utc=now_utc,
     )
+
+
+@admin_bp.get("/presentation")
+@role_required("admin")
+def presentation_control():
+    team_id_raw = (request.args.get("team_id") or "").strip()
+    selected_team_id = None
+    if team_id_raw:
+        try:
+            selected_team_id = int(team_id_raw)
+        except ValueError:
+            flash("Invalid team selected for presentation control.", "warning")
+
+    try:
+        teams = _get_active_teams_for_presentation()
+    except SQLAlchemyError as exc:
+        current_app.logger.error("Presentation team list query failed: %s", exc)
+        flash("Unable to load presentation queue.", "danger")
+        teams = []
+
+    current_team = None
+    if selected_team_id:
+        current_team = next((team for team in teams if team.id == selected_team_id), None)
+        if current_team is None:
+            flash("Selected team is not available in the active presentation queue.", "warning")
+
+    if current_team is None:
+        current_team = _find_default_presentation_team(teams)
+
+    previous_team_id, next_team_id = _find_adjacent_team_ids(teams, current_team.id if current_team else None)
+    next_pending_team = _find_next_pending_team(teams, current_team.id if current_team else None)
+    if current_team and next_pending_team and next_pending_team.id == current_team.id:
+        next_pending_team = None
+
+    pending_count = sum(1 for team in teams if not team.presentation_completed)
+    completed_count = len(teams) - pending_count
+
+    return render_template(
+        "admin/presentation.html",
+        teams=teams,
+        current_team=current_team,
+        next_pending_team=next_pending_team,
+        previous_team_id=previous_team_id,
+        next_team_id=next_team_id,
+        pending_count=pending_count,
+        completed_count=completed_count,
+    )
+
+
+@admin_bp.post("/presentation/<int:team_id>/complete")
+@role_required("admin")
+def mark_team_presentation_complete(team_id):
+    try:
+        team = Team.query.filter_by(id=team_id, is_active=True).first()
+        if not team:
+            flash("Team not found or inactive.", "warning")
+            return redirect(url_for("admin.presentation_control"))
+
+        if not team.presentation_completed:
+            team.presentation_completed = True
+            team.presentation_completed_at = _utcnow()
+            db.session.commit()
+            flash(f"Marked presentation completed for {team.team_name}.", "success")
+        else:
+            flash(f"{team.team_name} is already marked completed.", "info")
+
+        teams = _get_active_teams_for_presentation()
+        next_pending_team = _find_next_pending_team(teams, team.id)
+        if next_pending_team is not None:
+            return redirect(url_for("admin.presentation_control", team_id=next_pending_team.id))
+    except SQLAlchemyError as exc:
+        db.session.rollback()
+        current_app.logger.error("Mark team presentation complete failed: %s", exc)
+        flash("Unable to mark team as completed.", "danger")
+
+    return redirect(url_for("admin.presentation_control"))
+
+
+@admin_bp.post("/presentation/<int:team_id>/reopen")
+@role_required("admin")
+def reopen_team_presentation(team_id):
+    try:
+        team = Team.query.filter_by(id=team_id, is_active=True).first()
+        if not team:
+            flash("Team not found or inactive.", "warning")
+            return redirect(url_for("admin.presentation_control"))
+
+        team.presentation_completed = False
+        team.presentation_completed_at = None
+        db.session.commit()
+        flash(f"{team.team_name} moved back to pending queue.", "success")
+    except SQLAlchemyError as exc:
+        db.session.rollback()
+        current_app.logger.error("Reopen team presentation failed: %s", exc)
+        flash("Unable to reopen team in presentation queue.", "danger")
+
+    return redirect(url_for("admin.presentation_control", team_id=team_id))
+
+
+@admin_bp.post("/presentation/reset")
+@role_required("admin")
+def reset_presentation_queue():
+    try:
+        updated_count = (
+            Team.query.filter(Team.presentation_completed.is_(True)).update(
+                {
+                    Team.presentation_completed: False,
+                    Team.presentation_completed_at: None,
+                },
+                synchronize_session=False,
+            )
+        )
+        db.session.commit()
+        flash(f"Presentation queue reset for {updated_count} team(s).", "success")
+    except SQLAlchemyError as exc:
+        db.session.rollback()
+        current_app.logger.error("Reset presentation queue failed: %s", exc)
+        flash("Unable to reset presentation queue.", "danger")
+
+    return redirect(url_for("admin.presentation_control"))
 
 
 @admin_bp.route("/teams/new", methods=["GET", "POST"])

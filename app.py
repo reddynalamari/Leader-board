@@ -88,6 +88,24 @@ def ensure_database_compatibility(app):
 			connection.execute(
 				text(
 					"""
+					ALTER TABLE teams
+					ADD COLUMN IF NOT EXISTS presentation_completed BOOLEAN NOT NULL DEFAULT FALSE
+					"""
+				)
+			)
+
+			connection.execute(
+				text(
+					"""
+					ALTER TABLE teams
+					ADD COLUMN IF NOT EXISTS presentation_completed_at TIMESTAMPTZ
+					"""
+				)
+			)
+
+			connection.execute(
+				text(
+					"""
 					UPDATE teams
 					SET sort_order = id::INTEGER
 					WHERE sort_order IS NULL OR sort_order = 0
@@ -97,6 +115,12 @@ def ensure_database_compatibility(app):
 
 			connection.execute(
 				text("CREATE INDEX IF NOT EXISTS idx_teams_sort_order ON teams (sort_order)")
+			)
+
+			connection.execute(
+				text(
+					"CREATE INDEX IF NOT EXISTS idx_teams_presentation_completed ON teams (presentation_completed)"
+				)
 			)
 
 			connection.execute(

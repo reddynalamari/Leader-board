@@ -297,6 +297,125 @@ def test_admin_team_reorder_flow(app, admin_client):
             db.session.commit()
 
 
+def test_admin_presentation_control_flow(app, admin_client):
+    team_one_name = _unique_name("team_present_a")
+    team_two_name = _unique_name("team_present_b")
+
+    with app.app_context():
+        team_one = Team(
+            team_name=team_one_name,
+            sort_order=-1000,
+            process="General",
+            theme="Presentation",
+            is_active=True,
+            presentation_completed=False,
+        )
+        team_one.project = Project(
+            project_title="Presentation Project A",
+            problem_statement="Statement A",
+            project_summary="Summary A",
+        )
+        team_one.members.append(
+            TeamMember(
+                full_name="Presenter A",
+                email=f"presenter_a_{uuid.uuid4().hex[:6]}@example.com",
+            )
+        )
+
+        team_two = Team(
+            team_name=team_two_name,
+            sort_order=-999,
+            process="General",
+            theme="Presentation",
+            is_active=True,
+            presentation_completed=False,
+        )
+        team_two.project = Project(
+            project_title="Presentation Project B",
+            problem_statement="Statement B",
+            project_summary="Summary B",
+        )
+        team_two.members.append(
+            TeamMember(
+                full_name="Presenter B",
+                email=f"presenter_b_{uuid.uuid4().hex[:6]}@example.com",
+            )
+        )
+
+        db.session.add(team_one)
+        db.session.add(team_two)
+        db.session.commit()
+
+        team_one_id = team_one.id
+        team_two_id = team_two.id
+
+    try:
+        page_response = admin_client.get(
+            f"/admin/presentation?team_id={team_one_id}",
+            follow_redirects=False,
+        )
+        assert page_response.status_code == 200
+        page_text = page_response.get_data(as_text=True)
+        assert "Presentation Control" in page_text
+        assert team_one_name in page_text
+        assert team_two_name in page_text
+        assert "Presenter A" in page_text
+        assert "Presenter B" in page_text
+
+        complete_response = admin_client.post(
+            f"/admin/presentation/{team_one_id}/complete",
+            follow_redirects=False,
+        )
+        assert complete_response.status_code == 302
+
+        with app.app_context():
+            refreshed_team_one = Team.query.filter_by(id=team_one_id).first()
+            assert refreshed_team_one is not None
+            assert refreshed_team_one.presentation_completed is True
+            assert refreshed_team_one.presentation_completed_at is not None
+
+        reopen_response = admin_client.post(
+            f"/admin/presentation/{team_one_id}/reopen",
+            follow_redirects=False,
+        )
+        assert reopen_response.status_code == 302
+
+        with app.app_context():
+            reopened_team_one = Team.query.filter_by(id=team_one_id).first()
+            assert reopened_team_one is not None
+            assert reopened_team_one.presentation_completed is False
+            assert reopened_team_one.presentation_completed_at is None
+
+        admin_client.post(
+            f"/admin/presentation/{team_one_id}/complete",
+            follow_redirects=False,
+        )
+        admin_client.post(
+            f"/admin/presentation/{team_two_id}/complete",
+            follow_redirects=False,
+        )
+
+        reset_response = admin_client.post(
+            "/admin/presentation/reset",
+            follow_redirects=False,
+        )
+        assert reset_response.status_code == 302
+
+        with app.app_context():
+            refreshed_team_one = Team.query.filter_by(id=team_one_id).first()
+            refreshed_team_two = Team.query.filter_by(id=team_two_id).first()
+            assert refreshed_team_one is not None
+            assert refreshed_team_two is not None
+            assert refreshed_team_one.presentation_completed is False
+            assert refreshed_team_two.presentation_completed is False
+            assert refreshed_team_one.presentation_completed_at is None
+            assert refreshed_team_two.presentation_completed_at is None
+    finally:
+        with app.app_context():
+            Team.query.filter(Team.id.in_([team_one_id, team_two_id])).delete(synchronize_session=False)
+            db.session.commit()
+
+
 def test_judge_score_edit_and_lock_flow(app, client):
     judge_username = _unique_name("judge_step9")
     judge_password = "judgepass123"

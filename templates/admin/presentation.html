@@ -1,0 +1,442 @@
+{% extends 'base.html' %}
+
+{% block title %}Presentation Control{% endblock %}
+
+{% block content %}
+{% if previous_team_id %}
+<a
+    class="team-side-nav team-side-nav-left"
+    href="{{ url_for('admin.presentation_control', team_id=previous_team_id) }}"
+    aria-label="Go to previous team"
+    title="Previous team (Left Arrow)">
+    &#x2039;
+</a>
+{% endif %}
+
+{% if next_team_id %}
+<a
+    class="team-side-nav team-side-nav-right"
+    href="{{ url_for('admin.presentation_control', team_id=next_team_id) }}"
+    aria-label="Go to next team"
+    title="Next team (Right Arrow)">
+    &#x203A;
+</a>
+{% endif %}
+
+<div class="row g-3 align-items-center mb-4">
+    <div class="col-lg-8">
+        <h2 class="mb-1 fw-bold text-dark"><i class="bi bi-stopwatch me-2 text-danger"></i>Presentation Control</h2>
+        <p class="text-muted mb-0">Live calling panel for team presentations with timer, queue progress, and team members.</p>
+    </div>
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm presentation-timer-card">
+            <div class="card-body p-3">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="small text-muted text-uppercase">Timer</div>
+                        <div id="presentation-clock" class="presentation-clock">00:00</div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" id="timer-toggle" class="btn btn-sm btn-outline-danger rounded-pill px-3">
+                            <i class="bi bi-pause-fill"></i> Pause
+                        </button>
+                        <button type="button" id="timer-reset" class="btn btn-sm btn-light rounded-pill px-3 border">
+                            <i class="bi bi-arrow-counterclockwise"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="timer-status" class="small mt-2 text-success fw-semibold">Within 5 minute slot</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small text-uppercase mb-1">Total Active Teams</div>
+                <div class="h3 mb-0 fw-bold">{{ teams|length }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small text-uppercase mb-1">Pending Presentations</div>
+                <div class="h3 mb-0 fw-bold text-warning">{{ pending_count }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="text-muted small text-uppercase mb-1">Completed Presentations</div>
+                <div class="h3 mb-0 fw-bold text-success">{{ completed_count }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if current_team %}
+<div class="row g-4 mb-4">
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-megaphone me-2 text-primary"></i>Current Team Presenting</h5>
+                {% if current_team.presentation_completed %}
+                <span class="badge text-bg-success">Completed</span>
+                {% else %}
+                <span class="badge text-bg-warning">Pending</span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="text-muted small">Team Name</div>
+                        <div class="fw-semibold">{{ current_team.team_name }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="text-muted small">Theme</div>
+                        <div class="fw-semibold">{{ current_team.theme }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="text-muted small">Process</div>
+                        <div class="fw-semibold">{{ current_team.process }}</div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="text-muted small">Project</div>
+                        <div class="fw-semibold">{{ current_team.project.project_title if current_team.project else '-' }}</div>
+                    </div>
+                    <div class="col-12">
+                        <div class="text-muted small">Team Members</div>
+                        {% if current_team.members %}
+                        <div class="d-flex flex-wrap gap-2 mt-1">
+                            {% for member in current_team.members|sort(attribute='id') %}
+                            <span class="badge rounded-pill text-bg-light border">{{ member.full_name }}</span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="text-muted">No members added.</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-white d-flex gap-2 flex-wrap justify-content-between">
+                <div class="d-flex gap-2 flex-wrap">
+                    {% if current_team.presentation_completed %}
+                    <form method="post" action="{{ url_for('admin.reopen_team_presentation', team_id=current_team.id) }}">
+                        <button type="submit" class="btn btn-outline-warning btn-sm">
+                            <i class="bi bi-arrow-counterclockwise me-1"></i>Move Back To Pending
+                        </button>
+                    </form>
+                    {% else %}
+                    <form method="post" action="{{ url_for('admin.mark_team_presentation_complete', team_id=current_team.id) }}">
+                        <button type="submit" class="btn btn-success btn-sm">
+                            <i class="bi bi-check2-circle me-1"></i>Mark Presentation Completed
+                        </button>
+                    </form>
+                    {% endif %}
+
+                    <a class="btn btn-outline-primary btn-sm" href="{{ url_for('admin.list_teams') }}">
+                        <i class="bi bi-people me-1"></i>Team Management
+                    </a>
+                </div>
+
+                <form method="post" action="{{ url_for('admin.reset_presentation_queue') }}" onsubmit="return confirm('Reset all teams back to pending presentation queue?');">
+                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                        <i class="bi bi-arrow-repeat me-1"></i>Reset Queue
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-skip-forward me-2 text-info"></i>Next Team Details</h5>
+            </div>
+            <div class="card-body">
+                {% if next_pending_team %}
+                <div class="mb-3">
+                    <div class="text-muted small">Team Name</div>
+                    <div class="fw-semibold">{{ next_pending_team.team_name }}</div>
+                </div>
+                <div class="mb-3">
+                    <div class="text-muted small">Theme / Process</div>
+                    <div class="fw-semibold">{{ next_pending_team.theme }} / {{ next_pending_team.process }}</div>
+                </div>
+                <div class="mb-3">
+                    <div class="text-muted small">Project</div>
+                    <div class="fw-semibold">{{ next_pending_team.project.project_title if next_pending_team.project else '-' }}</div>
+                </div>
+                <div>
+                    <div class="text-muted small">Members</div>
+                    {% if next_pending_team.members %}
+                    <ul class="mb-0 mt-1 ps-3">
+                        {% for member in next_pending_team.members|sort(attribute='id') %}
+                        <li>{{ member.full_name }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <div class="text-muted">No members added.</div>
+                    {% endif %}
+                </div>
+                {% else %}
+                <div class="alert alert-success mb-0">
+                    <i class="bi bi-check2-all me-1"></i>All pending teams are completed.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-warning">
+    <i class="bi bi-exclamation-triangle me-1"></i>No active teams available for presentation.
+</div>
+{% endif %}
+
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+        <h5 class="mb-0 fw-bold"><i class="bi bi-list-ol me-2 text-secondary"></i>Presentation Queue</h5>
+        <span class="small text-muted">Use Left/Right arrow keys for previous and next team.</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 70px;">Order</th>
+                        <th>Team</th>
+                        <th>Project</th>
+                        <th>Members</th>
+                        <th style="width: 120px;">Status</th>
+                        <th style="width: 130px;">Open</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for team in teams %}
+                    <tr {% if current_team and team.id == current_team.id %}class="table-primary-subtle"{% endif %}>
+                        <td>{{ loop.index }}</td>
+                        <td>
+                            <div class="fw-semibold">{{ team.team_name }}</div>
+                            <div class="small text-muted">{{ team.theme }} / {{ team.process }}</div>
+                        </td>
+                        <td>{{ team.project.project_title if team.project else '-' }}</td>
+                        <td>
+                            {% if team.members %}
+                            <div class="d-flex flex-wrap gap-1">
+                                {% for member in team.members|sort(attribute='id') %}
+                                <span class="badge rounded-pill text-bg-light border">{{ member.full_name }}</span>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <span class="text-muted small">No members</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if team.presentation_completed %}
+                            <span class="badge text-bg-success">Completed</span>
+                            {% else %}
+                            <span class="badge text-bg-warning">Pending</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a class="btn btn-sm btn-outline-primary" href="{{ url_for('admin.presentation_control', team_id=team.id) }}">
+                                Open
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">No teams available.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div
+    id="presentation-timer-config"
+    data-default-seconds="300"
+    data-previous-url="{{ url_for('admin.presentation_control', team_id=previous_team_id) if previous_team_id else '' }}"
+    data-next-url="{{ url_for('admin.presentation_control', team_id=next_team_id) if next_team_id else '' }}"
+    hidden>
+</div>
+
+<style>
+.presentation-clock {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    line-height: 1;
+}
+
+.presentation-overtime-banner {
+    border: 1px solid rgba(220, 53, 69, 0.4);
+    background: rgba(220, 53, 69, 0.08);
+}
+
+body.presentation-overtime {
+    background: #ffe5e8;
+}
+
+body.presentation-overtime .presentation-timer-card {
+    border: 1px solid rgba(220, 53, 69, 0.6) !important;
+    background: #fff1f3;
+}
+
+body.presentation-overtime .team-side-nav {
+    background: #dc3545;
+}
+
+body.presentation-overtime .team-side-nav:hover {
+    background: #b02a37;
+}
+
+body.presentation-overtime .navbar {
+    background: #6f1d1b !important;
+}
+</style>
+
+<script>
+(function () {
+    const config = document.getElementById('presentation-timer-config');
+    const clockElement = document.getElementById('presentation-clock');
+    const statusElement = document.getElementById('timer-status');
+    const toggleButton = document.getElementById('timer-toggle');
+    const resetButton = document.getElementById('timer-reset');
+    if (!config || !clockElement || !statusElement || !toggleButton || !resetButton) {
+        return;
+    }
+
+    const storageKey = 'admin_presentation_timer_v1';
+    const defaultSeconds = Number(config.dataset.defaultSeconds || '300');
+    const previousUrl = config.dataset.previousUrl || '';
+    const nextUrl = config.dataset.nextUrl || '';
+
+    function nowMs() {
+        return Date.now();
+    }
+
+    function loadState() {
+        try {
+            const raw = localStorage.getItem(storageKey);
+            if (!raw) {
+                return {
+                    elapsedMs: 0,
+                    running: true,
+                    lastTickMs: nowMs(),
+                };
+            }
+
+            const parsed = JSON.parse(raw);
+            return {
+                elapsedMs: Number(parsed.elapsedMs || 0),
+                running: Boolean(parsed.running),
+                lastTickMs: Number(parsed.lastTickMs || nowMs()),
+            };
+        } catch (error) {
+            return {
+                elapsedMs: 0,
+                running: true,
+                lastTickMs: nowMs(),
+            };
+        }
+    }
+
+    const state = loadState();
+
+    function persistState() {
+        localStorage.setItem(storageKey, JSON.stringify(state));
+    }
+
+    function twoDigits(value) {
+        return String(value).padStart(2, '0');
+    }
+
+    function formatTime(totalSeconds) {
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        return twoDigits(minutes) + ':' + twoDigits(seconds);
+    }
+
+    function updateTimerVisuals() {
+        const elapsedSeconds = Math.max(0, Math.floor(state.elapsedMs / 1000));
+        const overtimeSeconds = elapsedSeconds - defaultSeconds;
+        clockElement.textContent = formatTime(elapsedSeconds);
+
+        if (overtimeSeconds >= 0) {
+            document.body.classList.add('presentation-overtime');
+            statusElement.className = 'small mt-2 text-danger fw-semibold';
+            statusElement.textContent = 'Overtime +' + formatTime(overtimeSeconds);
+        } else {
+            document.body.classList.remove('presentation-overtime');
+            statusElement.className = 'small mt-2 text-success fw-semibold';
+            statusElement.textContent = 'Within 5 minute slot';
+        }
+
+        toggleButton.innerHTML = state.running
+            ? '<i class="bi bi-pause-fill"></i> Pause'
+            : '<i class="bi bi-play-fill"></i> Resume';
+    }
+
+    function tick() {
+        const currentMs = nowMs();
+        if (state.running) {
+            const delta = Math.max(0, currentMs - state.lastTickMs);
+            state.elapsedMs += delta;
+        }
+        state.lastTickMs = currentMs;
+        updateTimerVisuals();
+        persistState();
+    }
+
+    toggleButton.addEventListener('click', function () {
+        state.running = !state.running;
+        state.lastTickMs = nowMs();
+        updateTimerVisuals();
+        persistState();
+    });
+
+    resetButton.addEventListener('click', function () {
+        state.elapsedMs = 0;
+        state.running = true;
+        state.lastTickMs = nowMs();
+        updateTimerVisuals();
+        persistState();
+    });
+
+    document.addEventListener('keydown', function (event) {
+        if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) {
+            return;
+        }
+
+        const target = event.target;
+        const tagName = target && target.tagName ? target.tagName.toUpperCase() : '';
+        const isEditable = tagName === 'INPUT' || tagName === 'TEXTAREA' || tagName === 'SELECT' || (target && target.isContentEditable);
+        if (isEditable) {
+            return;
+        }
+
+        if (event.key === 'ArrowLeft' && previousUrl) {
+            event.preventDefault();
+            window.location.href = previousUrl;
+            return;
+        }
+
+        if (event.key === 'ArrowRight' && nextUrl) {
+            event.preventDefault();
+            window.location.href = nextUrl;
+        }
+    });
+
+    updateTimerVisuals();
+    setInterval(tick, 1000);
+})();
+</script>
+{% endblock %}
