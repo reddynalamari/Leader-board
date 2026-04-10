@@ -20,6 +20,7 @@
 				<th>Project</th>
 				<th>Summary</th>
 				<th>Progress</th>
+				<th>Lock</th>
 				<th>Your Total</th>
 				<th>Action</th>
 			</tr>
@@ -40,6 +41,13 @@
 						<span class="badge text-bg-warning ms-1">Pending</span>
 					{% endif %}
 				</td>
+				<td>
+					{% if team.is_locked %}
+						<span class="badge text-bg-dark">Locked</span>
+					{% else %}
+						<span class="badge text-bg-light">Editable</span>
+					{% endif %}
+				</td>
 				<td>{{ '%.2f'|format(team.judge_total) }}</td>
 				<td>
 					<a class="btn btn-sm btn-primary" href="{{ url_for('judge.score_team', team_id=team.id) }}">
@@ -49,7 +57,7 @@
 			</tr>
 			{% else %}
 			<tr>
-				<td colspan="8" class="text-center text-muted">No active teams are available for scoring.</td>
+				<td colspan="9" class="text-center text-muted">No active teams are available for scoring.</td>
 			</tr>
 			{% endfor %}
 		</tbody>

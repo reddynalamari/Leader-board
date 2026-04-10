@@ -29,6 +29,12 @@
 
 <form method="post" class="card">
     <div class="card-body">
+        {% if existing_snapshot.is_locked %}
+        <div class="alert alert-dark" role="alert">
+            This scorecard is locked. Editing is disabled.
+        </div>
+        {% endif %}
+
         <div class="row g-3">
             {% for category in category_definitions %}
             <div class="col-md-6">
@@ -45,6 +51,7 @@
                     max="10"
                     step="0.01"
                     value="{{ score_values.get(category.key) if score_values.get(category.key) is not none else '' }}"
+                    {% if existing_snapshot.is_locked %}disabled{% endif %}
                     required>
                 <div class="form-text">Enter a score between 0 and 10.</div>
             </div>
@@ -52,7 +59,7 @@
 
             <div class="col-12">
                 <label for="remarks" class="form-label">Remarks (Optional)</label>
-                <textarea id="remarks" name="remarks" class="form-control" rows="3">{{ remarks }}</textarea>
+                <textarea id="remarks" name="remarks" class="form-control" rows="3" {% if existing_snapshot.is_locked %}disabled{% endif %}>{{ remarks }}</textarea>
             </div>
 
             <div class="col-12">
@@ -70,8 +77,13 @@
     </div>
 
     <div class="card-footer bg-white d-flex justify-content-end gap-2 flex-wrap">
+        {% if existing_snapshot.is_locked %}
+        <a href="{{ url_for('judge.dashboard') }}" class="btn btn-outline-secondary">Back to Dashboard</a>
+        {% else %}
         <button type="submit" name="action" value="save" class="btn btn-primary">Save Scores</button>
         <button type="submit" name="action" value="save_next" class="btn btn-outline-primary">Save and Next Team</button>
+        <button type="submit" name="action" value="save_lock" class="btn btn-dark">Save and Lock</button>
+        {% endif %}
     </div>
 </form>
 

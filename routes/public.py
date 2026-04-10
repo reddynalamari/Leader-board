@@ -6,7 +6,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.security import check_password_hash
 
 from models.user import User
-from services.scoring_service import get_live_scoreboard_rows
+from services.scoring_service import get_live_scoreboard_rows, get_scoreboard_tie_break_rule
 from utils.auth import authenticate_admin
 
 
@@ -34,6 +34,7 @@ def scoreboard():
         rows=rows,
         refresh_interval_ms=5000,
         generated_at=datetime.now(timezone.utc),
+        tie_break_rule=get_scoreboard_tie_break_rule(),
     )
 
 
@@ -44,6 +45,7 @@ def scoreboard_data():
         {
             "rows": rows,
             "generated_at": datetime.now(timezone.utc).isoformat(),
+            "tie_break_rule": get_scoreboard_tie_break_rule(),
         }
     )
 

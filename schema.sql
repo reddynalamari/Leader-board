@@ -82,6 +82,7 @@ CREATE TABLE scores (
         )
     ) STORED,
     remarks TEXT,
+    is_locked BOOLEAN NOT NULL DEFAULT FALSE,
     submitted_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     UNIQUE (judge_id, team_id, category)

@@ -12,6 +12,7 @@ from services.judge_scoring_service import (
     get_judge_dashboard_rows,
     get_judge_team_score_snapshot,
     get_next_active_team_id,
+    is_judge_team_locked,
     save_or_update_judge_scores,
 )
 from utils.auth import role_required
@@ -68,8 +69,14 @@ def score_team(team_id):
     remarks = snapshot["remarks"]
 
     if request.method == "POST":
+        if is_judge_team_locked(judge_profile.id, team.id):
+            flash("Scores are locked for this team and cannot be edited.", "warning")
+            return redirect(url_for("judge.score_team", team_id=team.id))
+
         raw_scores = {item["key"]: request.form.get(item["key"], "").strip() for item in CATEGORY_DEFINITIONS}
         remarks = request.form.get("remarks", "").strip()
+        action = request.form.get("action", "save")
+        lock_after_save = action == "save_lock"
 
         try:
             for item in CATEGORY_DEFINITIONS:
@@ -77,10 +84,21 @@ def score_team(team_id):
                 if not score_text:
                     raise ValueError(f"{item['label']} is required.")
 
-            save_or_update_judge_scores(judge_profile.id, team.id, raw_scores, remarks)
-            flash("Scores saved successfully.", "success")
+            save_or_update_judge_scores(
+                judge_id=judge_profile.id,
+                team_id=team.id,
+                raw_scores=raw_scores,
+                remarks=remarks,
+                actor_user_id=current_user.id,
+                lock_after_save=lock_after_save,
+            )
 
-            if request.form.get("action") == "save_next":
+            if lock_after_save:
+                flash("Scores saved and locked successfully.", "success")
+            else:
+                flash("Scores saved successfully.", "success")
+
+            if action == "save_next":
                 next_team_id = get_next_active_team_id(team.id)
                 if next_team_id:
                     return redirect(url_for("judge.score_team", team_id=next_team_id))

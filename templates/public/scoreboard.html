@@ -13,6 +13,10 @@
     Public view, no login required. Rankings update automatically when judges submit scores.
 </p>
 
+<p class="small text-muted mb-3">
+    {{ tie_break_rule }}
+</p>
+
 <div class="mb-3 p-2 border rounded bg-light small d-flex justify-content-between align-items-center flex-wrap gap-2">
     <span>Last updated: <strong id="scoreboard-last-updated">{{ generated_at.strftime('%Y-%m-%d %H:%M:%S UTC') }}</strong></span>
     <span id="scoreboard-status" class="text-muted">Live</span>

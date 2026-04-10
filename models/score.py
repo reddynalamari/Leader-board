@@ -49,6 +49,7 @@ class Score(db.Model):
         ),
     )
     remarks = db.Column(db.Text, nullable=True)
+    is_locked = db.Column(db.Boolean, nullable=False, default=False)
     submitted_at = db.Column(db.DateTime(timezone=True), server_default=db.func.now(), nullable=False)
     updated_at = db.Column(
         db.DateTime(timezone=True),
