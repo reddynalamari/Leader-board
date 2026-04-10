@@ -86,7 +86,11 @@ def get_judge_team_score_snapshot(judge_id, team_id):
 
 
 def get_judge_dashboard_rows(judge_id):
-    teams = Team.query.filter(Team.is_active.is_(True)).order_by(Team.id.asc()).all()
+    teams = (
+        Team.query.filter(Team.is_active.is_(True))
+        .order_by(Team.sort_order.asc(), Team.id.asc())
+        .all()
+    )
     if not teams:
         return []
 
@@ -121,6 +125,26 @@ def get_judge_dashboard_rows(judge_id):
         )
 
     return dashboard_rows
+
+
+def get_adjacent_active_team_ids(current_team_id):
+    teams = (
+        Team.query.filter(Team.is_active.is_(True))
+        .order_by(Team.sort_order.asc(), Team.id.asc())
+        .all()
+    )
+    if not teams:
+        return None, None
+
+    ordered_ids = [team.id for team in teams]
+    try:
+        index = ordered_ids.index(current_team_id)
+    except ValueError:
+        return None, None
+
+    previous_team_id = ordered_ids[index - 1] if index > 0 else None
+    next_team_id = ordered_ids[index + 1] if index < len(ordered_ids) - 1 else None
+    return previous_team_id, next_team_id
 
 
 def save_or_update_judge_scores(
@@ -271,11 +295,5 @@ def is_judge_team_locked(judge_id, team_id):
 
 
 def get_next_active_team_id(current_team_id):
-    next_team = (
-        Team.query.filter(Team.is_active.is_(True), Team.id > current_team_id)
-        .order_by(Team.id.asc())
-        .first()
-    )
-    if not next_team:
-        return None
-    return next_team.id
+    _, next_team_id = get_adjacent_active_team_ids(current_team_id)
+    return next_team_id

@@ -34,6 +34,7 @@ CREATE TABLE judges (
 CREATE TABLE teams (
     id BIGSERIAL PRIMARY KEY,
     team_name VARCHAR(120) NOT NULL UNIQUE,
+    sort_order INTEGER NOT NULL DEFAULT 0,
     process VARCHAR(120) NOT NULL DEFAULT 'General',
     theme VARCHAR(120) NOT NULL,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
@@ -138,6 +139,7 @@ CREATE TABLE audit_logs (
 );
 
 CREATE INDEX idx_team_members_team_id ON team_members (team_id);
+CREATE INDEX idx_teams_sort_order ON teams (sort_order);
 CREATE INDEX idx_scores_team_id ON scores (team_id);
 CREATE INDEX idx_scores_judge_id ON scores (judge_id);
 CREATE INDEX idx_scores_category ON scores (category);

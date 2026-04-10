@@ -116,6 +116,55 @@ def test_admin_team_and_member_crud_flow(app, admin_client):
         assert Team.query.filter_by(id=team_id).first() is None
 
 
+def test_admin_team_reorder_flow(app, admin_client):
+    team_names = [_unique_name("team_order_a"), _unique_name("team_order_b"), _unique_name("team_order_c")]
+
+    with app.app_context():
+        created_ids = []
+        for index, team_name in enumerate(team_names, start=1):
+            team = Team(
+                team_name=team_name,
+                sort_order=index,
+                process="General",
+                theme="OrderTest",
+                is_active=True,
+            )
+            team.project = Project(
+                project_title=f"Project {index}",
+                problem_statement="Ordering test",
+                project_summary="Ordering summary",
+            )
+            db.session.add(team)
+        db.session.commit()
+
+        created_rows = Team.query.filter(Team.team_name.in_(team_names)).order_by(Team.sort_order.asc(), Team.id.asc()).all()
+        created_ids = [row.id for row in created_rows]
+
+    try:
+        with app.app_context():
+            all_team_ids = [row.id for row in Team.query.order_by(Team.sort_order.asc(), Team.id.asc()).all()]
+
+        reordered_created_ids = list(reversed(created_ids))
+        remaining_ids = [team_id for team_id in all_team_ids if team_id not in set(created_ids)]
+        reordered_ids = reordered_created_ids + remaining_ids
+
+        reorder_response = admin_client.post(
+            "/admin/teams/reorder",
+            json={"team_ids": reordered_ids},
+            follow_redirects=False,
+        )
+        assert reorder_response.status_code == 200
+        assert reorder_response.get_json().get("ok") is True
+
+        with app.app_context():
+            ordered_rows = Team.query.filter(Team.id.in_(created_ids)).order_by(Team.sort_order.asc(), Team.id.asc()).all()
+            assert [row.id for row in ordered_rows] == reordered_created_ids
+    finally:
+        with app.app_context():
+            Team.query.filter(Team.id.in_(created_ids)).delete(synchronize_session=False)
+            db.session.commit()
+
+
 def test_judge_score_edit_and_lock_flow(app, client):
     judge_username = _unique_name("judge_step9")
     judge_password = "judgepass123"

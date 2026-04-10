@@ -8,6 +8,7 @@ class Team(db.Model):
 
     id = db.Column(db.BigInteger, primary_key=True)
     team_name = db.Column(db.String(120), nullable=False, unique=True)
+    sort_order = db.Column(db.Integer, nullable=False, default=0, index=True)
     process = db.Column(db.String(120), nullable=False, default="General")
     theme = db.Column(db.String(120), nullable=False)
     is_active = db.Column(db.Boolean, nullable=False, default=True)

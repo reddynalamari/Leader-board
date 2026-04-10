@@ -114,7 +114,7 @@
                         <th>Action</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="pending-login-requests-body">
                     {% for login_request, judge, user in pending_login_requests %}
                     <tr>
                         <td>{{ login_request.id }}</td>
@@ -143,4 +143,115 @@
         </div>
     </div>
 </div>
+
+<div
+    id="pending-login-request-config"
+    data-approve-template="{{ url_for('admin.approve_login_request', request_id=999999999)|replace('999999999', '__REQUEST_ID__') }}"
+    data-reject-template="{{ url_for('admin.reject_login_request', request_id=999999999)|replace('999999999', '__REQUEST_ID__') }}"
+    hidden>
+</div>
+
+<script>
+(function () {
+    const configElement = document.getElementById('pending-login-request-config');
+    const tableBody = document.getElementById('pending-login-requests-body');
+    if (!configElement || !tableBody) {
+        return;
+    }
+
+    const approveTemplate = configElement.dataset.approveTemplate;
+    const rejectTemplate = configElement.dataset.rejectTemplate;
+
+    function formatUtc(isoText) {
+        if (!isoText) {
+            return '-';
+        }
+
+        const date = new Date(isoText);
+        if (Number.isNaN(date.getTime())) {
+            return '-';
+        }
+
+        return date.toISOString().replace('T', ' ').replace('Z', ' UTC');
+    }
+
+    function createActionCell(requestId) {
+        const actionCell = document.createElement('td');
+        const actionsContainer = document.createElement('div');
+        actionsContainer.className = 'd-flex gap-1 flex-wrap';
+
+        const approveForm = document.createElement('form');
+        approveForm.method = 'post';
+        approveForm.action = approveTemplate.replace('__REQUEST_ID__', String(requestId));
+
+        const approveButton = document.createElement('button');
+        approveButton.type = 'submit';
+        approveButton.className = 'btn btn-sm btn-success';
+        approveButton.textContent = 'Approve';
+        approveForm.appendChild(approveButton);
+
+        const rejectForm = document.createElement('form');
+        rejectForm.method = 'post';
+        rejectForm.action = rejectTemplate.replace('__REQUEST_ID__', String(requestId));
+
+        const rejectButton = document.createElement('button');
+        rejectButton.type = 'submit';
+        rejectButton.className = 'btn btn-sm btn-outline-danger';
+        rejectButton.textContent = 'Reject';
+        rejectForm.appendChild(rejectButton);
+
+        actionsContainer.appendChild(approveForm);
+        actionsContainer.appendChild(rejectForm);
+        actionCell.appendChild(actionsContainer);
+        return actionCell;
+    }
+
+    function renderPendingRows(items) {
+        tableBody.innerHTML = '';
+
+        if (!items || items.length === 0) {
+            const emptyRow = document.createElement('tr');
+            const emptyCell = document.createElement('td');
+            emptyCell.colSpan = 6;
+            emptyCell.className = 'text-center text-muted';
+            emptyCell.textContent = 'No pending login requests.';
+            emptyRow.appendChild(emptyCell);
+            tableBody.appendChild(emptyRow);
+            return;
+        }
+
+        items.forEach((item) => {
+            const row = document.createElement('tr');
+
+            const requestIdCell = document.createElement('td');
+            requestIdCell.textContent = String(item.request_id);
+            row.appendChild(requestIdCell);
+
+            const judgeCell = document.createElement('td');
+            judgeCell.textContent = String(item.judge_name || '-');
+            row.appendChild(judgeCell);
+
+            const loginKeyCell = document.createElement('td');
+            loginKeyCell.textContent = String(item.login_key || '-');
+            row.appendChild(loginKeyCell);
+
+            const requestedAsCell = document.createElement('td');
+            requestedAsCell.textContent = String(item.requested_login || '-');
+            row.appendChild(requestedAsCell);
+
+            const requestedAtCell = document.createElement('td');
+            requestedAtCell.textContent = formatUtc(item.created_at);
+            row.appendChild(requestedAtCell);
+
+            row.appendChild(createActionCell(item.request_id));
+            tableBody.appendChild(row);
+        });
+    }
+
+    document.addEventListener('admin-login-requests-updated', (event) => {
+        const items = event && event.detail ? event.detail.items : [];
+        renderPendingRows(items);
+    });
+})();
+</script>
 {% endblock %}

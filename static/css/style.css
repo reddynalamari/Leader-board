@@ -24,8 +24,70 @@ body {
     white-space: nowrap;
 }
 
+.team-side-nav {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0d6efd;
+    color: #fff;
+    text-decoration: none;
+    font-size: 2rem;
+    line-height: 1;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+    z-index: 1030;
+    opacity: 0.92;
+}
+
+.team-side-nav:hover {
+    color: #fff;
+    opacity: 1;
+    background: #0b5ed7;
+}
+
+.team-side-nav-left {
+    left: 10px;
+}
+
+.team-side-nav-right {
+    right: 10px;
+}
+
+.team-row-draggable {
+    cursor: grab;
+}
+
+.team-row-draggable.dragging {
+    opacity: 0.55;
+}
+
+.team-order-handle {
+    cursor: grab;
+    color: #6c757d;
+    user-select: none;
+}
+
 @media (max-width: 768px) {
     .scoreboard-title {
         font-size: 1.45rem;
+    }
+
+    .team-side-nav {
+        width: 44px;
+        height: 44px;
+        font-size: 1.5rem;
+    }
+
+    .team-side-nav-left {
+        left: 6px;
+    }
+
+    .team-side-nav-right {
+        right: 6px;
     }
 }

@@ -52,9 +52,32 @@ def ensure_database_compatibility(app):
 				text(
 					"""
 					ALTER TABLE teams
+					ADD COLUMN IF NOT EXISTS sort_order INTEGER NOT NULL DEFAULT 0
+					"""
+				)
+			)
+
+			connection.execute(
+				text(
+					"""
+					ALTER TABLE teams
 					ADD COLUMN IF NOT EXISTS process VARCHAR(120) NOT NULL DEFAULT 'General'
 					"""
 				)
+			)
+
+			connection.execute(
+				text(
+					"""
+					UPDATE teams
+					SET sort_order = id::INTEGER
+					WHERE sort_order IS NULL OR sort_order = 0
+					"""
+				)
+			)
+
+			connection.execute(
+				text("CREATE INDEX IF NOT EXISTS idx_teams_sort_order ON teams (sort_order)")
 			)
 
 			connection.execute(

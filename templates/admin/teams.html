@@ -8,10 +8,16 @@
     <a class="btn btn-primary" href="{{ url_for('admin.create_team') }}">Add Team</a>
 </div>
 
+<p class="text-muted small mb-3">
+    Drag and drop rows using the handle to change team order used in judge navigation.
+    <span id="team-reorder-status" class="ms-2"></span>
+</p>
+
 <div class="table-responsive">
     <table class="table table-bordered table-striped align-middle">
         <thead class="table-dark">
             <tr>
+                <th style="width: 60px;">Order</th>
                 <th>ID</th>
                 <th>Team Name</th>
                 <th>Process</th>
@@ -22,9 +28,13 @@
                 <th>Actions</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="team-order-body">
             {% for team in teams %}
-            <tr>
+            <tr data-team-id="{{ team.id }}" class="team-row-draggable" draggable="true">
+                <td>
+                    <span class="team-order-handle" title="Drag to reorder">&#x2630;</span>
+                    <span class="team-order-index small text-muted ms-1">{{ loop.index }}</span>
+                </td>
                 <td>{{ team.id }}</td>
                 <td>{{ team.team_name }}</td>
                 <td>{{ team.process }}</td>
@@ -55,10 +65,130 @@
             </tr>
             {% else %}
             <tr>
-                <td colspan="8" class="text-center text-muted">No teams found.</td>
+                <td colspan="9" class="text-center text-muted">No teams found.</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
+
+<div id="team-reorder-config" data-endpoint="{{ url_for('admin.reorder_teams') }}" hidden></div>
+
+<script>
+(function () {
+    const tableBody = document.getElementById('team-order-body');
+    const configElement = document.getElementById('team-reorder-config');
+    const statusElement = document.getElementById('team-reorder-status');
+    if (!tableBody || !configElement) {
+        return;
+    }
+
+    const reorderEndpoint = configElement.dataset.endpoint;
+    let draggingRow = null;
+
+    function updateOrderIndices() {
+        const rows = tableBody.querySelectorAll('tr[data-team-id]');
+        rows.forEach((row, index) => {
+            const indexElement = row.querySelector('.team-order-index');
+            if (indexElement) {
+                indexElement.textContent = String(index + 1);
+            }
+        });
+    }
+
+    function showStatus(message, isError) {
+        if (!statusElement) {
+            return;
+        }
+
+        statusElement.textContent = message;
+        statusElement.className = isError ? 'ms-2 text-danger' : 'ms-2 text-success';
+    }
+
+    function getOrderedTeamIds() {
+        return Array.from(tableBody.querySelectorAll('tr[data-team-id]'))
+            .map((row) => Number(row.dataset.teamId))
+            .filter((id) => Number.isFinite(id));
+    }
+
+    async function persistOrder() {
+        const orderedIds = getOrderedTeamIds();
+        if (orderedIds.length === 0) {
+            return;
+        }
+
+        try {
+            const response = await fetch(reorderEndpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ team_ids: orderedIds }),
+            });
+
+            const payload = await response.json();
+            if (!response.ok) {
+                showStatus(payload.error || 'Unable to save team order.', true);
+                return;
+            }
+
+            showStatus('Team order saved.', false);
+        } catch (error) {
+            showStatus('Network error while saving team order.', true);
+        }
+    }
+
+    function handleDragStart(event) {
+        const row = event.currentTarget;
+        draggingRow = row;
+        row.classList.add('dragging');
+        event.dataTransfer.effectAllowed = 'move';
+        event.dataTransfer.setData('text/plain', row.dataset.teamId || '');
+    }
+
+    function handleDragEnd(event) {
+        event.currentTarget.classList.remove('dragging');
+        updateOrderIndices();
+    }
+
+    function handleDragOver(event) {
+        event.preventDefault();
+        if (!draggingRow) {
+            return;
+        }
+
+        const targetRow = event.target.closest('tr[data-team-id]');
+        if (!targetRow || targetRow === draggingRow) {
+            return;
+        }
+
+        const rect = targetRow.getBoundingClientRect();
+        const insertAfter = event.clientY > rect.top + rect.height / 2;
+        tableBody.insertBefore(draggingRow, insertAfter ? targetRow.nextSibling : targetRow);
+    }
+
+    async function handleDrop(event) {
+        event.preventDefault();
+        if (!draggingRow) {
+            return;
+        }
+
+        const droppedRow = draggingRow;
+        draggingRow = null;
+        droppedRow.classList.remove('dragging');
+
+        updateOrderIndices();
+        await persistOrder();
+    }
+
+    const rows = tableBody.querySelectorAll('tr[data-team-id]');
+    rows.forEach((row) => {
+        row.addEventListener('dragstart', handleDragStart);
+        row.addEventListener('dragend', handleDragEnd);
+    });
+
+    tableBody.addEventListener('dragover', handleDragOver);
+    tableBody.addEventListener('drop', handleDrop);
+})();
+</script>
 {% endblock %}

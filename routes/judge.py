@@ -9,6 +9,7 @@ from services.judge_scoring_service import (
     CATEGORY_COUNT,
     CATEGORY_DEFINITIONS,
     calculate_total_from_raw_scores,
+    get_adjacent_active_team_ids,
     get_judge_dashboard_rows,
     get_judge_team_score_snapshot,
     get_next_active_team_id,
@@ -65,6 +66,7 @@ def score_team(team_id):
         return redirect(url_for("judge.dashboard"))
 
     snapshot = get_judge_team_score_snapshot(judge_profile.id, team.id)
+    previous_team_id, next_team_id = get_adjacent_active_team_ids(team.id)
     score_values = snapshot["score_values"].copy()
     remarks = snapshot["remarks"]
 
@@ -133,4 +135,6 @@ def score_team(team_id):
         remarks=remarks,
         existing_snapshot=snapshot,
         preview_total=calculate_total_from_raw_scores(preview_raw_scores),
+        previous_team_id=previous_team_id,
+        next_team_id=next_team_id,
     )

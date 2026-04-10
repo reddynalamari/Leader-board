@@ -3,10 +3,32 @@
 {% block title %}Score Team - {{ team.team_name }}{% endblock %}
 
 {% block content %}
+{% if previous_team_id %}
+<a
+    class="team-side-nav team-side-nav-left"
+    href="{{ url_for('judge.score_team', team_id=previous_team_id) }}"
+    aria-label="Go to previous team"
+    title="Previous team (Left Arrow)">
+    &#x2039;
+</a>
+{% endif %}
+
+{% if next_team_id %}
+<a
+    class="team-side-nav team-side-nav-right"
+    href="{{ url_for('judge.score_team', team_id=next_team_id) }}"
+    aria-label="Go to next team"
+    title="Next team (Right Arrow)">
+    &#x203A;
+</a>
+{% endif %}
+
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="mb-0">Score Team: {{ team.team_name }}</h2>
     <a class="btn btn-outline-secondary" href="{{ url_for('judge.dashboard') }}">Back to Dashboard</a>
 </div>
+
+<p class="text-muted small mb-3">Use Left/Right arrow keys to move to previous/next team.</p>
 
 <div class="card mb-4">
     <div class="card-body">
@@ -87,10 +109,20 @@
     </div>
 </form>
 
+<div
+    id="team-nav-config"
+    data-previous-url="{{ url_for('judge.score_team', team_id=previous_team_id) if previous_team_id else '' }}"
+    data-next-url="{{ url_for('judge.score_team', team_id=next_team_id) if next_team_id else '' }}"
+    hidden>
+</div>
+
 <script>
 (function () {
     const inputs = document.querySelectorAll('.score-input');
     const totalElement = document.getElementById('live-total');
+    const navConfig = document.getElementById('team-nav-config');
+    const previousTeamUrl = (navConfig && navConfig.dataset.previousUrl) || '';
+    const nextTeamUrl = (navConfig && navConfig.dataset.nextUrl) || '';
 
     function updateTotal() {
         let total = 0;
@@ -106,6 +138,30 @@
 
     inputs.forEach((input) => {
         input.addEventListener('input', updateTotal);
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) {
+            return;
+        }
+
+        const target = event.target;
+        const tagName = target && target.tagName ? target.tagName.toUpperCase() : '';
+        const isEditable = tagName === 'INPUT' || tagName === 'TEXTAREA' || tagName === 'SELECT' || (target && target.isContentEditable);
+        if (isEditable) {
+            return;
+        }
+
+        if (event.key === 'ArrowLeft' && previousTeamUrl) {
+            event.preventDefault();
+            window.location.href = previousTeamUrl;
+            return;
+        }
+
+        if (event.key === 'ArrowRight' && nextTeamUrl) {
+            event.preventDefault();
+            window.location.href = nextTeamUrl;
+        }
     });
 
     updateTotal();

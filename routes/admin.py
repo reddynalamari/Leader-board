@@ -329,7 +329,7 @@ def list_teams():
                 joinedload(Team.project),
                 joinedload(Team.members),
             )
-            .order_by(Team.id.asc())
+            .order_by(Team.sort_order.asc(), Team.id.asc())
             .all()
         )
     except SQLAlchemyError as exc:
@@ -360,8 +360,11 @@ def create_team():
                     process_options=process_options,
                 )
 
+            max_sort_order = db.session.query(db.func.coalesce(db.func.max(Team.sort_order), 0)).scalar() or 0
+
             team = Team(
                 team_name=payload["team_name"],
+                sort_order=int(max_sort_order) + 1,
                 process=payload["process"],
                 theme=payload["theme"],
                 is_active=payload["is_active"],
@@ -396,6 +399,46 @@ def create_team():
         theme_options=theme_options,
         process_options=process_options,
     )
+
+
+@admin_bp.post("/teams/reorder")
+@role_required("admin")
+def reorder_teams():
+    payload = request.get_json(silent=True) or {}
+    team_ids_raw = payload.get("team_ids")
+
+    if not isinstance(team_ids_raw, list) or not team_ids_raw:
+        return jsonify({"error": "team_ids must be a non-empty list."}), 400
+
+    normalized_ids = []
+    seen = set()
+    for item in team_ids_raw:
+        try:
+            team_id = int(item)
+        except (TypeError, ValueError):
+            return jsonify({"error": "team_ids contains non-integer values."}), 400
+
+        if team_id in seen:
+            return jsonify({"error": "team_ids contains duplicate values."}), 400
+
+        seen.add(team_id)
+        normalized_ids.append(team_id)
+
+    existing_ids = {item[0] for item in db.session.query(Team.id).all()}
+    if set(normalized_ids) != existing_ids:
+        return jsonify({"error": "team_ids must include all teams exactly once."}), 400
+
+    try:
+        team_map = {team.id: team for team in Team.query.filter(Team.id.in_(normalized_ids)).all()}
+        for position, team_id in enumerate(normalized_ids, start=1):
+            team_map[team_id].sort_order = position
+
+        db.session.commit()
+        return jsonify({"ok": True, "updated": len(normalized_ids)})
+    except SQLAlchemyError as exc:
+        db.session.rollback()
+        current_app.logger.error("Team reorder failed: %s", exc)
+        return jsonify({"error": "Unable to save team order."}), 500
 
 
 @admin_bp.route("/teams/<int:team_id>/edit", methods=["GET", "POST"])

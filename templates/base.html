@@ -85,11 +85,21 @@
 
             const payload = await response.json();
             updateBadge(Number(payload.count || 0));
+            const itemList = Array.isArray(payload.items) ? payload.items : [];
 
             const localCountBadge = document.getElementById('pending-request-count');
             if (localCountBadge) {
                 localCountBadge.textContent = String(Number(payload.count || 0));
             }
+
+            document.dispatchEvent(
+                new CustomEvent('admin-login-requests-updated', {
+                    detail: {
+                        count: Number(payload.count || 0),
+                        items: itemList,
+                    },
+                })
+            );
         } catch (error) {
             // Ignore temporary polling errors and retry in next interval.
         }
