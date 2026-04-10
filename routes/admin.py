@@ -42,7 +42,13 @@ admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 @admin_bp.get("/dashboard")
 @role_required("admin")
 def dashboard():
-    return render_template("admin/dashboard.html")
+    stats = {
+        "teams": db.session.query(Team).count(),
+        "judges": db.session.query(Judge).count() - 1, # Exclude admin if admin is counted as judge, actually Admin is User
+        "pending_requests": db.session.query(JudgeLoginRequest).filter_by(status=LOGIN_REQUEST_STATUS_PENDING).count(),
+        "total_scores": db.session.query(Score).count()
+    }
+    return render_template("admin/dashboard.html", stats=stats)
 
 
 def _seed_defaults_after_kill_switch():
