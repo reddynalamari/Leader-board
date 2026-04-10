@@ -6,6 +6,7 @@ from urllib.parse import urlparse
 
 from flask import Blueprint, current_app, flash, jsonify, redirect, render_template, request, url_for
 from flask_login import current_user
+from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import joinedload
 from werkzeug.security import generate_password_hash
@@ -23,15 +24,17 @@ from models.auth_access import (
 )
 from models.options import ProcessOption, ThemeOption
 from models.score import Score
+from models.scoring import ScoringCategorySetting
 from models.team import Project, Team, TeamMember
 from models.user import Judge, User
 from services.presence_service import get_judge_online_map
 from services.scoring_config_service import (
+    DEFAULT_SCORING_RULES,
     get_category_definitions,
     normalize_scoring_updates,
     save_scoring_updates,
 )
-from utils.auth import role_required
+from utils.auth import authenticate_admin, role_required
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -40,6 +43,53 @@ admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 @role_required("admin")
 def dashboard():
     return render_template("admin/dashboard.html")
+
+
+def _seed_defaults_after_kill_switch():
+    db.session.add(ProcessOption(name="General"))
+    db.session.add(ThemeOption(name="General"))
+
+    for category_key, defaults in DEFAULT_SCORING_RULES.items():
+        db.session.add(
+            ScoringCategorySetting(
+                category=category_key,
+                weight_percent=defaults["weight_percent"],
+                max_score=defaults["max_score"],
+            )
+        )
+
+
+@admin_bp.post("/kill-switch/wipe-database")
+@role_required("admin")
+def kill_switch_wipe_database():
+    admin_password = request.form.get("admin_password", "")
+    admin_username = getattr(current_user, "username", "")
+
+    if not admin_password:
+        flash("Admin password is required.", "warning")
+        return redirect(url_for("admin.dashboard"))
+
+    if not authenticate_admin(admin_username, admin_password):
+        flash("Invalid admin password. Kill switch cancelled.", "danger")
+        return redirect(url_for("admin.dashboard"))
+
+    table_names = [table.name for table in db.metadata.sorted_tables if table.name]
+    quoted_table_list = ", ".join(f'"{name}"' for name in table_names)
+
+    try:
+        if quoted_table_list:
+            db.session.execute(text(f"TRUNCATE TABLE {quoted_table_list} RESTART IDENTITY CASCADE"))
+
+        _seed_defaults_after_kill_switch()
+        db.session.commit()
+        current_app.logger.warning("Kill switch executed by admin user '%s'.", admin_username)
+        flash("Kill switch completed. Database wiped and defaults restored.", "success")
+    except SQLAlchemyError as exc:
+        db.session.rollback()
+        current_app.logger.error("Kill switch execution failed: %s", exc)
+        flash("Kill switch failed. No changes were saved.", "danger")
+
+    return redirect(url_for("admin.dashboard"))
 
 
 @admin_bp.get("/options")

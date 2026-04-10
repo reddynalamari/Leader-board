@@ -1,11 +1,17 @@
+from datetime import datetime, timedelta, timezone
 import time
 import uuid
 
+import pytest
 from werkzeug.security import generate_password_hash
 
 from models import db
 from models.audit import AuditLog
+from models.auth_access import JudgeDirectLoginLink, JudgeLoginRequest, TeamDirectLoginLink
+from models.options import ProcessOption, ThemeOption
+from models.presence import JudgePresence
 from models.score import SCORE_CATEGORIES, Score
+from models.scoring import ScoringCategorySetting
 from models.team import Project, Team, TeamMember
 from models.user import Judge, User
 
@@ -21,6 +27,132 @@ def test_access_control_and_not_found(client):
 
     not_found_response = client.get("/route-that-does-not-exist")
     assert not_found_response.status_code == 404
+
+
+def test_admin_kill_switch_wipes_database_and_restores_defaults(app, admin_client):
+    admin_password = app.config.get("ADMIN_PASSWORD")
+    if not admin_password:
+        pytest.skip("ADMIN_PASSWORD is required to validate kill switch flow.")
+
+    judge_username = _unique_name("judge_kill_switch")
+    team_name = _unique_name("team_kill_switch")
+
+    with app.app_context():
+        judge_user = User(
+            username=judge_username,
+            email=f"{judge_username}@example.com",
+            password_hash=generate_password_hash("judgepass123"),
+            role="judge",
+            is_active=True,
+        )
+        judge_profile = Judge(user=judge_user, display_name="Judge Kill Switch", is_active=True)
+
+        team = Team(team_name=team_name, process="General", theme="ResetTheme", is_active=True)
+        team.project = Project(
+            project_title="Kill Switch Project",
+            problem_statement="Reset everything",
+            project_summary="Reset summary",
+        )
+        team.members.append(
+            TeamMember(
+                full_name="Kill Switch Member",
+                email=f"member_{team_name}@example.com",
+            )
+        )
+
+        db.session.add(ProcessOption(name=_unique_name("proc")))
+        db.session.add(ThemeOption(name=_unique_name("theme")))
+        db.session.add(judge_user)
+        db.session.add(team)
+        db.session.flush()
+
+        db.session.add(
+            Score(
+                judge_id=judge_profile.id,
+                team_id=team.id,
+                category="innovation_originality",
+                raw_score=9,
+                remarks="seed",
+            )
+        )
+        db.session.add(
+            JudgePresence(
+                judge_id=judge_profile.id,
+                is_online=True,
+                last_seen_at=datetime.now(timezone.utc),
+            )
+        )
+        db.session.add(
+            JudgeDirectLoginLink(
+                judge_id=judge_profile.id,
+                token=_unique_name("judge_link"),
+                expires_at=datetime.now(timezone.utc) + timedelta(minutes=30),
+                created_by_admin="admin",
+            )
+        )
+        db.session.add(
+            JudgeLoginRequest(
+                judge_id=judge_profile.id,
+                request_key=_unique_name("request"),
+                requested_login=judge_username,
+                status="pending",
+            )
+        )
+        db.session.add(
+            TeamDirectLoginLink(
+                team_id=team.id,
+                token=_unique_name("team_link"),
+                expires_at=datetime.now(timezone.utc) + timedelta(minutes=30),
+                created_by_admin="admin",
+            )
+        )
+
+        # Change one scoring setting so the kill switch must restore defaults.
+        setting = ScoringCategorySetting.query.filter_by(category="innovation_originality").first()
+        if setting:
+            setting.weight_percent = 20
+            setting.max_score = 15
+
+        db.session.commit()
+
+        assert User.query.count() > 0
+        assert Team.query.count() > 0
+        assert Score.query.count() > 0
+
+    response = admin_client.post(
+        "/admin/kill-switch/wipe-database",
+        data={"admin_password": admin_password},
+        follow_redirects=False,
+    )
+    assert response.status_code == 302
+
+    with app.app_context():
+        assert User.query.count() == 0
+        assert Judge.query.count() == 0
+        assert Team.query.count() == 0
+        assert TeamMember.query.count() == 0
+        assert Project.query.count() == 0
+        assert Score.query.count() == 0
+        assert JudgePresence.query.count() == 0
+        assert JudgeDirectLoginLink.query.count() == 0
+        assert JudgeLoginRequest.query.count() == 0
+        assert TeamDirectLoginLink.query.count() == 0
+        assert AuditLog.query.count() == 0
+
+        process_names = {row.name for row in ProcessOption.query.all()}
+        theme_names = {row.name for row in ThemeOption.query.all()}
+        assert "General" in process_names
+        assert "General" in theme_names
+
+        settings = {
+            row.category: (float(row.weight_percent), float(row.max_score))
+            for row in ScoringCategorySetting.query.all()
+        }
+        assert len(settings) == 4
+        assert settings["innovation_originality"] == (30.0, 10.0)
+        assert settings["technical_implementation"] == (30.0, 10.0)
+        assert settings["business_value_impact"] == (25.0, 10.0)
+        assert settings["presentation_clarity"] == (15.0, 10.0)
 
 
 def test_admin_team_and_member_crud_flow(app, admin_client):

@@ -10,4 +10,46 @@
 	<a class="btn btn-outline-primary" href="{{ url_for('admin.manage_judges') }}">Manage Judges</a>
 	<a class="btn btn-outline-dark" href="{{ url_for('admin.manage_options') }}">Manage Options</a>
 </div>
+
+<div class="card border-danger mt-4">
+	<div class="card-header bg-danger text-white">Danger Zone</div>
+	<div class="card-body">
+		<p class="mb-3">
+			Kill switch will wipe the entire database and restore defaults.
+		</p>
+		<button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#killSwitchModal">
+			Kill Switch
+		</button>
+	</div>
+</div>
+
+<div class="modal fade" id="killSwitchModal" tabindex="-1" aria-labelledby="killSwitchModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<form method="post" action="{{ url_for('admin.kill_switch_wipe_database') }}">
+				<div class="modal-header">
+					<h5 class="modal-title" id="killSwitchModalLabel">Confirm Kill Switch</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<p class="text-danger mb-3">This will delete all teams, judges, scores, links, requests, and logs.</p>
+					<div class="mb-3">
+						<label for="admin_password" class="form-label">Enter admin password to continue</label>
+						<input
+							type="password"
+							class="form-control"
+							id="admin_password"
+							name="admin_password"
+							autocomplete="current-password"
+							required>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+					<button type="submit" class="btn btn-danger">Wipe Database</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
 {% endblock %}
