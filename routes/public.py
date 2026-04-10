@@ -3,7 +3,6 @@ import secrets
 
 from flask import Blueprint, current_app, flash, jsonify, redirect, render_template, request, url_for
 from flask_login import current_user, login_required, login_user, logout_user
-from sqlalchemy import or_
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import joinedload
 from werkzeug.security import check_password_hash
@@ -53,7 +52,7 @@ def _find_active_judge_user(identifier):
             User.role == "judge",
             User.is_active.is_(True),
             Judge.is_active.is_(True),
-            or_(User.username == normalized_identifier, Judge.display_name == normalized_identifier),
+            User.username == normalized_identifier,
         )
         .first()
     )
@@ -101,15 +100,19 @@ def login():
     if current_user.is_authenticated:
         return _redirect_to_role_dashboard(getattr(current_user, "role", None))
 
-    prefill_username = request.args.get("username", "").strip()
+    existing_team = get_logged_in_team()
+    if existing_team:
+        return redirect(url_for("public.team_portal"))
+
+    prefill_username = request.args.get("username", "").strip() or request.args.get("team_id", "").strip()
 
     if request.method == "POST":
-        username = request.form.get("username", "").strip()
+        username = (request.form.get("username") or request.form.get("team_login_id") or "").strip()
         password = request.form.get("password", "")
         prefill_username = username
 
         if not username or not password:
-            flash("Name or username and password are required.", "warning")
+            flash("Username or Team ID and password are required.", "warning")
             return render_template(
                 "public/login.html",
                 prefill_username=prefill_username,
@@ -119,7 +122,7 @@ def login():
         admin_user = authenticate_admin(username, password)
         if admin_user:
             login_user(admin_user)
-            flash("Admin login successful.", "success")
+            flash("Login successful.", "success")
             return redirect(url_for("admin.dashboard"))
 
         try:
@@ -141,7 +144,7 @@ def login():
 
         if judge_user and check_password_hash(judge_user.password_hash, password):
             if judge_user.judge_profile and not judge_user.judge_profile.is_active:
-                flash("This judge account is inactive.", "warning")
+                flash("This account is inactive.", "warning")
                 return render_template(
                     "public/login.html",
                     prefill_username=prefill_username,
@@ -151,8 +154,14 @@ def login():
             login_user(judge_user)
             if judge_user.judge_profile:
                 mark_judge_online(judge_user.judge_profile.id)
-            flash("Judge login successful.", "success")
+            flash("Login successful.", "success")
             return redirect(url_for("judge.dashboard"))
+
+        team = authenticate_team(username, password)
+        if team:
+            login_team(team)
+            flash("Login successful.", "success")
+            return redirect(url_for("public.team_portal"))
 
         flash("Invalid username or password.", "danger")
 
@@ -248,12 +257,12 @@ def request_login_access():
     requested_login = (request_data.get("username") or "").strip()
 
     if not requested_login:
-        return jsonify({"error": "Name or username is required."}), 400
+        return jsonify({"error": "Username is required."}), 400
 
     try:
         judge_user = _find_active_judge_user(requested_login)
         if not judge_user or not judge_user.judge_profile:
-            return jsonify({"error": "Judge account not found."}), 404
+            return jsonify({"error": "Account not found."}), 404
 
         judge_profile = judge_user.judge_profile
         pending_request = (
@@ -381,31 +390,23 @@ def consume_login_request():
 
 @public_bp.route("/team/login", methods=["GET", "POST"])
 def team_login():
-    existing_team = get_logged_in_team()
-    if existing_team:
-        return redirect(url_for("public.team_portal"))
+    # Backward-compatible alias: use the single login portal.
+    if request.method == "POST":
+        login_id = (request.form.get("team_login_id") or request.form.get("username") or "").strip()
+        password = request.form.get("password", "")
+
+        if login_id and password:
+            team = authenticate_team(login_id, password)
+            if team:
+                login_team(team)
+                flash("Login successful.", "success")
+                return redirect(url_for("public.team_portal"))
+
+        flash("Invalid username or password.", "danger")
+        return redirect(url_for("public.login", username=login_id))
 
     prefill_login_id = request.args.get("team_id", "").strip()
-
-    if request.method == "POST":
-        login_id = (request.form.get("team_login_id") or "").strip()
-        password = request.form.get("password", "")
-        prefill_login_id = login_id
-
-        if not login_id or not password:
-            flash("Team ID and password are required.", "warning")
-            return render_template("public/team_login.html", prefill_login_id=prefill_login_id)
-
-        team = authenticate_team(login_id, password)
-        if not team:
-            flash("Invalid team login credentials.", "danger")
-            return render_template("public/team_login.html", prefill_login_id=prefill_login_id)
-
-        login_team(team)
-        flash("Team login successful.", "success")
-        return redirect(url_for("public.team_portal"))
-
-    return render_template("public/team_login.html", prefill_login_id=prefill_login_id)
+    return redirect(url_for("public.login", username=prefill_login_id))
 
 
 @public_bp.get("/team/direct-login/<token>")
@@ -415,11 +416,11 @@ def team_direct_login(token):
     except SQLAlchemyError as exc:
         current_app.logger.error("Team direct login link lookup failed: %s", exc)
         flash("Team direct login is temporarily unavailable.", "danger")
-        return redirect(url_for("public.team_login"))
+        return redirect(url_for("public.login"))
 
     if not direct_link:
         flash("This team link is invalid.", "warning")
-        return redirect(url_for("public.team_login"))
+        return redirect(url_for("public.login"))
 
     team = Team.query.filter_by(id=direct_link.team_id).first()
     team_id_hint = team.portal_login_id if team else ""
@@ -427,15 +428,15 @@ def team_direct_login(token):
 
     if direct_link.revoked_at is not None:
         flash("This team link is no longer active.", "warning")
-        return redirect(url_for("public.team_login", team_id=team_id_hint))
+        return redirect(url_for("public.login", username=team_id_hint))
 
     if direct_link.expires_at <= now_utc:
         flash("This team link has expired. Please login with Team ID and password.", "warning")
-        return redirect(url_for("public.team_login", team_id=team_id_hint))
+        return redirect(url_for("public.login", username=team_id_hint))
 
     if not team or not team.is_active or not team.portal_login_id or not team.portal_password_hash:
         flash("Team account is not ready for login.", "warning")
-        return redirect(url_for("public.team_login", team_id=team_id_hint))
+        return redirect(url_for("public.login", username=team_id_hint))
 
     try:
         direct_link.last_used_at = now_utc
@@ -453,7 +454,7 @@ def team_direct_login(token):
 def team_portal():
     team = get_logged_in_team()
     if not team:
-        return redirect(url_for("public.team_login"))
+        return redirect(url_for("public.login"))
 
     members = TeamMember.query.filter_by(team_id=team.id).order_by(TeamMember.id.asc()).all()
 
@@ -502,8 +503,8 @@ def team_portal():
 @public_bp.get("/team/logout")
 def team_logout():
     logout_team()
-    flash("Team logged out successfully.", "info")
-    return redirect(url_for("public.team_login"))
+    flash("Logged out successfully.", "info")
+    return redirect(url_for("public.login"))
 
 
 @public_bp.get("/logout")

@@ -224,8 +224,8 @@ def test_team_portal_and_judge_presence_flow(app, client, admin_client):
         assert presence_response.get_json()["online"].get(str(judge_profile_id)) is True
 
         team_login_response = team_client.post(
-            "/team/login",
-            data={"team_login_id": team_login_id, "password": team_password},
+            "/login",
+            data={"username": team_login_id, "password": team_password},
             follow_redirects=False,
         )
         assert team_login_response.status_code == 302

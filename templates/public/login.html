@@ -8,10 +8,10 @@
         <div class="card shadow-sm">
             <div class="card-body p-4">
                 <h2 class="h4 mb-3">Login</h2>
-                <p class="text-muted mb-4">Admins and judges can sign in here.</p>
+                <p class="text-muted mb-4">Sign in</p>
                 <form method="post" novalidate>
                     <div class="mb-3">
-                        <label for="username" class="form-label">Name / Username</label>
+                        <label for="username" class="form-label">Username / Team ID</label>
                         <input type="text" class="form-control" id="username" name="username" value="{{ prefill_username or '' }}" required>
                     </div>
                     <div class="mb-3">
@@ -24,11 +24,8 @@
                 <hr class="my-4">
 
                 <div>
-                    <p class="small text-muted mb-2">
-                        If your direct login link is expired or unavailable, raise a direct login request for admin approval.
-                    </p>
                     <button type="button" id="raise-login-request-btn" class="btn btn-outline-secondary w-100">
-                        Request Direct Login
+                        Request Access
                     </button>
                     <div id="login-request-status" class="small mt-3 text-muted"></div>
                 </div>
@@ -172,7 +169,7 @@
     async function raiseLoginRequest() {
         const username = (usernameInput.value || '').trim();
         if (!username) {
-            setStatus('Enter your name or username before raising request.', 'warning');
+            setStatus('Enter your username before requesting access.', 'warning');
             usernameInput.focus();
             return;
         }

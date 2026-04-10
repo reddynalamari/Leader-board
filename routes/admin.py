@@ -814,16 +814,28 @@ def delete_team_member(team_id, member_id):
 @role_required("admin")
 def manage_judges():
     if request.method == "POST":
+        username = request.form.get("username", "").strip().lower()
         display_name = request.form.get("display_name", "").strip()
         password = request.form.get("password", "")
 
-        if not display_name or not password:
-            flash("Judge name and password are required.", "warning")
+        if not username or not display_name or not password:
+            flash("Username, name and password are required.", "warning")
+            return redirect(url_for("admin.manage_judges"))
+
+        if not re.fullmatch(r"[a-z0-9_.-]{3,80}", username):
+            flash("Username must be 3-80 characters using lowercase letters, numbers, dot, underscore or hyphen.", "warning")
+            return redirect(url_for("admin.manage_judges"))
+
+        if len(password) < 8:
+            flash("Password must be at least 8 characters.", "warning")
             return redirect(url_for("admin.manage_judges"))
 
         try:
-            username = _generate_unique_username_from_name(display_name)
-            internal_email = _generate_internal_email(_normalize_name_token(display_name))
+            if User.query.filter_by(username=username).first() is not None:
+                flash("Username already exists.", "warning")
+                return redirect(url_for("admin.manage_judges"))
+
+            internal_email = _generate_internal_email(_normalize_name_token(username))
 
             user = User(
                 username=username,

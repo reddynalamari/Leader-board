@@ -46,8 +46,8 @@ def team_login_required(view_func):
     def wrapped(*args, **kwargs):
         team = get_logged_in_team()
         if not team:
-            flash("Team login is required.", "warning")
-            return redirect(url_for("public.team_login"))
+            flash("Login is required.", "warning")
+            return redirect(url_for("public.login"))
 
         return view_func(*args, **kwargs)
 

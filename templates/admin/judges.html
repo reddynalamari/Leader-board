@@ -12,13 +12,17 @@
     <div class="card-body">
         <h3 class="h5 mb-3">Add Judge</h3>
         <form method="post" class="row g-3" novalidate>
-            <div class="col-md-6">
-                <label for="display_name" class="form-label">Judge Name</label>
+            <div class="col-md-4">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" id="username" name="username" class="form-control" pattern="[a-z0-9_.-]{3,80}" required>
+            </div>
+            <div class="col-md-4">
+                <label for="display_name" class="form-label">Name</label>
                 <input type="text" id="display_name" name="display_name" class="form-control" required>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <label for="password" class="form-label">Password</label>
-                <input type="password" id="password" name="password" class="form-control" required>
+                <input type="password" id="password" name="password" class="form-control" minlength="8" required>
             </div>
             <div class="col-12">
                 <button type="submit" class="btn btn-primary">Create Judge</button>
@@ -36,8 +40,8 @@
                     <tr>
                         <th>ID</th>
                         <th>Status</th>
-                        <th>Judge Name</th>
-                        <th>Login Key</th>
+                        <th>Name</th>
+                        <th>Username</th>
                         <th style="min-width: 240px;">Direct Login Link</th>
                         <th style="min-width: 260px;">Password</th>
                         <th>Action</th>
@@ -117,7 +121,7 @@
                     <tr>
                         <th>Request ID</th>
                         <th>Judge</th>
-                        <th>Login Key</th>
+                        <th>Username</th>
                         <th>Requested As</th>
                         <th>Requested At</th>
                         <th>Action</th>
