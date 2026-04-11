@@ -3,6 +3,7 @@
 {% block title %}Admin Dashboard{% endblock %}
 
 {% block content %}
+<section class="admin-dashboard-shell">
 <div class="row align-items-center mb-4">
     <div class="col-md-6">
         <h2 class="mb-0 fw-bold text-dark"><i class="bi bi-speedometer2 me-2 text-primary"></i> Admin Dashboard</h2>
@@ -221,30 +222,154 @@
     </div>
 </div>
 
+</section>
+
 <style>
-    /* Inline stylistic polish for dashboard elements without modifying style.css globally */
-    .widget-card {
+    .admin-dashboard-shell {
+        --ad-ink: #0f172a;
+        --ad-soft: #64748b;
+        --ad-surface: #ffffff;
+        --ad-surface-alt: #f8fafc;
+        --ad-line: #e2e8f0;
+        --ad-shadow: 0 0.5rem 1rem rgba(15, 23, 42, 0.1);
+        --ad-hover-shadow: 0 0.75rem 1.25rem rgba(15, 23, 42, 0.16);
+        color: var(--ad-ink);
+    }
+
+    [data-bs-theme="dark"] .admin-dashboard-shell {
+        --ad-ink: #e2e8f0;
+        --ad-soft: #94a3b8;
+        --ad-surface: #1e293b;
+        --ad-surface-alt: #0f172a;
+        --ad-line: rgba(148, 163, 184, 0.28);
+        --ad-shadow: 0 0.75rem 1.25rem rgba(2, 6, 23, 0.35);
+        --ad-hover-shadow: 0 1rem 1.5rem rgba(2, 6, 23, 0.5);
+    }
+
+    .admin-dashboard-shell .text-muted {
+        color: var(--ad-soft) !important;
+    }
+
+    .admin-dashboard-shell .text-dark,
+    .admin-dashboard-shell h1,
+    .admin-dashboard-shell h2,
+    .admin-dashboard-shell h3,
+    .admin-dashboard-shell h4,
+    .admin-dashboard-shell h5,
+    .admin-dashboard-shell h6 {
+        color: var(--ad-ink) !important;
+    }
+
+    .admin-dashboard-shell .card,
+    .admin-dashboard-shell .dropdown-menu,
+    .admin-dashboard-shell .modal-content {
+        background: var(--ad-surface);
+        border-color: var(--ad-line) !important;
+        color: var(--ad-ink);
+        box-shadow: var(--ad-shadow) !important;
+    }
+
+    .admin-dashboard-shell .card-header.bg-white {
+        background: transparent !important;
+    }
+
+    .admin-dashboard-shell .widget-card {
         transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
-    .widget-card:hover {
+
+    .admin-dashboard-shell .widget-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+        box-shadow: var(--ad-hover-shadow) !important;
     }
-    .text-spacing {
+
+    .admin-dashboard-shell .text-spacing {
         letter-spacing: 0.5px;
     }
-    .text-darken {
-        color: #b58000 !important; /* Slightly darker warning color for links */
+
+    .admin-dashboard-shell .text-darken {
+        color: #b58000 !important;
     }
-    .bg-info.bg-opacity-10 {
+
+    [data-bs-theme="dark"] .admin-dashboard-shell .text-darken {
+        color: #fbbf24 !important;
+    }
+
+    .admin-dashboard-shell .bg-info.bg-opacity-10 {
         background-color: rgba(13, 202, 240, 0.1) !important;
     }
-    .text-info {
-        color: #0dcaf0 !important;
+
+    .admin-dashboard-shell .text-info {
+        color: #0ea5e9 !important;
     }
-    .list-group-item:hover {
-        background-color: #f8f9fa;
+
+    .admin-dashboard-shell .list-group-item {
+        background-color: transparent;
+        border-color: var(--ad-line);
+        color: inherit;
+    }
+
+    .admin-dashboard-shell .list-group-item:hover {
+        background-color: var(--ad-surface-alt);
         border-radius: 6px;
+    }
+
+    .admin-dashboard-shell .dropdown-item {
+        color: var(--ad-ink);
+    }
+
+    .admin-dashboard-shell .dropdown-item:hover,
+    .admin-dashboard-shell .dropdown-item:focus {
+        background: var(--ad-surface-alt);
+        color: var(--ad-ink);
+    }
+
+    .admin-dashboard-shell .dropdown-divider {
+        border-color: var(--ad-line);
+    }
+
+    .admin-dashboard-shell .form-control,
+    .admin-dashboard-shell .form-control.bg-light {
+        background: var(--ad-surface-alt) !important;
+        color: var(--ad-ink) !important;
+        border: 1px solid var(--ad-line) !important;
+    }
+
+    .admin-dashboard-shell .form-control::placeholder {
+        color: var(--ad-soft);
+        opacity: 0.85;
+    }
+
+    .admin-dashboard-shell .form-control:focus {
+        border-color: #38bdf8 !important;
+        box-shadow: 0 0 0 0.2rem rgba(56, 189, 248, 0.2);
+    }
+
+    [data-bs-theme="dark"] .admin-dashboard-shell .btn-outline-secondary {
+        color: #cbd5e1;
+        border-color: #64748b;
+    }
+
+    [data-bs-theme="dark"] .admin-dashboard-shell .btn-outline-secondary:hover {
+        background: #334155;
+        color: #f8fafc;
+        border-color: #64748b;
+    }
+
+    [data-bs-theme="dark"] .admin-dashboard-shell .btn-light {
+        background: #334155;
+        border-color: #475569;
+        color: #e2e8f0 !important;
+    }
+
+    [data-bs-theme="dark"] .admin-dashboard-shell .btn-light:hover {
+        background: #475569;
+        color: #f8fafc !important;
+    }
+
+    [data-bs-theme="dark"] .admin-dashboard-shell .alert-danger {
+        background: rgba(220, 38, 38, 0.16);
+        border-color: rgba(248, 113, 113, 0.45);
+        color: #fecaca;
     }
 </style>
 {% endblock %}
