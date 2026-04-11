@@ -23,7 +23,7 @@
             icon.className = theme === 'dark' ? 'bi bi-moon-stars-fill' : 'bi bi-brightness-high-fill';
         }
         if (toggleText) {
-            toggleText.textContent = theme === 'dark' ? 'DARK MODE' : 'LIGHT MODE';
+            toggleText.textContent = theme === 'dark' ? 'DARK' : 'LIGHT';
         }
     };
 
@@ -52,26 +52,26 @@
 
 .theme-toggle {
     position: relative;
-    width: 132px;
-    height: 40px;
+    width: 66px;
+    height: 20px;
     border-radius: 999px;
-    border: 2px solid rgba(148, 163, 184, 0.4);
+    border: 1px solid rgba(148, 163, 184, 0.45);
     background: linear-gradient(145deg, #f8fafc, #e2e8f0);
     color: #64748b;
     display: inline-flex;
     align-items: center;
     justify-content: flex-end;
-    padding: 0 10px;
-    font-size: 0.64rem;
+    padding: 0 5px;
+    font-size: 0.38rem;
     font-weight: 800;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.04em;
     overflow: hidden;
     transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .theme-toggle .theme-toggle-text {
     position: absolute;
-    right: 14px;
+    right: 7px;
     color: #64748b;
     pointer-events: none;
     transition: transform 0.3s ease, color 0.3s ease;
@@ -79,10 +79,10 @@
 
 .theme-toggle .theme-toggle-knob {
     position: absolute;
-    left: 3px;
-    top: 3px;
-    width: 30px;
-    height: 30px;
+    left: 2px;
+    top: 2px;
+    width: 14px;
+    height: 14px;
     border-radius: 999px;
     border: 1px solid #cbd5e1;
     background: #f8fafc;
@@ -90,8 +90,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.95rem;
-    box-shadow: 0 3px 10px rgba(15, 23, 42, 0.22);
+    font-size: 0.5rem;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.25);
     transition: transform 0.3s ease, background 0.3s ease, color 0.3s ease;
 }
 
@@ -102,13 +102,13 @@
 
 .theme-toggle[data-theme="dark"] .theme-toggle-text {
     right: auto;
-    left: 14px;
+    left: 7px;
     transform: translateX(0);
     color: #cbd5e1;
 }
 
 .theme-toggle[data-theme="dark"] .theme-toggle-knob {
-    transform: translateX(92px);
+    transform: translateX(48px);
     background: #e5e7eb;
     color: #a8b0bc;
     border-color: #d1d5db;
@@ -125,28 +125,28 @@
 
 @media (max-width: 991.98px) {
     .theme-toggle {
-        width: 118px;
-        height: 36px;
-        font-size: 0.58rem;
-        padding: 0 8px;
+        width: 59px;
+        height: 18px;
+        font-size: 0.34rem;
+        padding: 0 4px;
     }
 
     .theme-toggle .theme-toggle-text {
-        right: 10px;
+        right: 6px;
     }
 
     .theme-toggle[data-theme="dark"] .theme-toggle-text {
-        left: 10px;
+        left: 6px;
     }
 
     .theme-toggle .theme-toggle-knob {
-        width: 26px;
-        height: 26px;
-        font-size: 0.82rem;
+        width: 12px;
+        height: 12px;
+        font-size: 0.45rem;
     }
 
     .theme-toggle[data-theme="dark"] .theme-toggle-knob {
-        transform: translateX(80px);
+        transform: translateX(43px);
     }
 }
 </style>
@@ -209,7 +209,7 @@
             <ul class="navbar-nav ms-auto align-items-lg-center">
                 <li class="nav-item ms-lg-3 mt-2 mt-lg-0 d-flex align-items-center">
                     <button class="theme-toggle" id="theme-toggler" data-theme="light" title="Toggle Theme" aria-label="Toggle color theme">
-                        <span class="theme-toggle-text" id="theme-toggle-text">LIGHT MODE</span>
+                        <span class="theme-toggle-text" id="theme-toggle-text">LIGHT</span>
                         <span class="theme-toggle-knob"><i class="bi bi-brightness-high-fill" id="theme-icon"></i></span>
                     </button>
                 </li>
