@@ -3,6 +3,7 @@
 {% block title %}Manage Team Members{% endblock %}
 
 {% block content %}
+<section class="admin-members-shell">
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="mb-0">Members - {{ team.team_name }}</h2>
     <a class="btn btn-outline-secondary" href="{{ url_for('admin.list_teams') }}">Back to Teams</a>
@@ -59,4 +60,67 @@
         </div>
     </div>
 </div>
+
+</section>
+
+<style>
+.admin-members-shell {
+    --mb-ink: #0f172a;
+    --mb-soft: #64748b;
+    --mb-surface: #ffffff;
+    --mb-surface-alt: #f8fafc;
+    --mb-line: #e2e8f0;
+    --mb-shadow: 0 0.5rem 1rem rgba(15, 23, 42, 0.08);
+    color: var(--mb-ink);
+}
+
+[data-bs-theme="dark"] .admin-members-shell {
+    --mb-ink: #e2e8f0;
+    --mb-soft: #94a3b8;
+    --mb-surface: #1e293b;
+    --mb-surface-alt: #0f172a;
+    --mb-line: rgba(148, 163, 184, 0.28);
+    --mb-shadow: 0 0.75rem 1.25rem rgba(2, 6, 23, 0.35);
+}
+
+.admin-members-shell .text-muted {
+    color: var(--mb-soft) !important;
+}
+
+.admin-members-shell .card {
+    background: var(--mb-surface);
+    border-color: var(--mb-line);
+    box-shadow: var(--mb-shadow) !important;
+}
+
+.admin-members-shell .form-control {
+    background: var(--mb-surface-alt);
+    color: var(--mb-ink);
+    border-color: var(--mb-line);
+}
+
+.admin-members-shell .table {
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--mb-ink);
+    --bs-table-border-color: var(--mb-line);
+    --bs-table-striped-bg: var(--mb-surface-alt);
+}
+
+[data-bs-theme="dark"] .admin-members-shell .table-dark th {
+    background: #0f172a;
+    color: #e2e8f0;
+    border-color: var(--mb-line);
+}
+
+[data-bs-theme="dark"] .admin-members-shell .btn-outline-secondary {
+    color: #cbd5e1;
+    border-color: #64748b;
+}
+
+[data-bs-theme="dark"] .admin-members-shell .btn-outline-secondary:hover {
+    background: #334155;
+    color: #f8fafc;
+    border-color: #64748b;
+}
+</style>
 {% endblock %}

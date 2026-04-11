@@ -378,8 +378,94 @@
 </script>
 
 <style>
+.judge-shell {
+    --jg-ink: #0f172a;
+    --jg-soft: #64748b;
+    --jg-surface: #ffffff;
+    --jg-surface-alt: #f8fafc;
+    --jg-line: #e2e8f0;
+    --jg-shadow: 0 0.5rem 1rem rgba(15, 23, 42, 0.08);
+    color: var(--jg-ink);
+}
+
+[data-bs-theme="dark"] .judge-shell {
+    --jg-ink: #e2e8f0;
+    --jg-soft: #94a3b8;
+    --jg-surface: #1e293b;
+    --jg-surface-alt: #0f172a;
+    --jg-line: rgba(148, 163, 184, 0.28);
+    --jg-shadow: 0 0.75rem 1.25rem rgba(2, 6, 23, 0.35);
+}
+
+.judge-shell .text-dark,
+.judge-shell h1,
+.judge-shell h2,
+.judge-shell h3,
+.judge-shell h4,
+.judge-shell h5,
+.judge-shell h6 {
+    color: var(--jg-ink) !important;
+}
+
+.judge-shell .text-muted,
+.judge-shell .text-secondary {
+    color: var(--jg-soft) !important;
+}
+
+.judge-shell .card {
+    background: var(--jg-surface);
+    border-color: var(--jg-line) !important;
+    box-shadow: var(--jg-shadow) !important;
+}
+
+.judge-shell .card-header.bg-white {
+    background: transparent !important;
+    border-color: var(--jg-line) !important;
+}
+
+.judge-shell .table {
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--jg-ink);
+    --bs-table-border-color: var(--jg-line);
+    --bs-table-hover-bg: rgba(14, 165, 233, 0.08);
+}
+
+.judge-shell .table-light {
+    --bs-table-bg: var(--jg-surface-alt);
+    --bs-table-color: var(--jg-soft);
+}
+
 .judge-shell .table > :not(caption) > * > * {
     vertical-align: middle;
+}
+
+.judge-shell .form-control,
+.judge-shell .form-select,
+.judge-shell .input-group-text {
+    background: var(--jg-surface-alt);
+    color: var(--jg-ink);
+    border-color: var(--jg-line);
+}
+
+.judge-shell .form-control::placeholder {
+    color: var(--jg-soft);
+}
+
+.judge-shell .badge.bg-light.text-dark {
+    background: var(--jg-surface-alt) !important;
+    color: var(--jg-ink) !important;
+    border-color: var(--jg-line) !important;
+}
+
+[data-bs-theme="dark"] .judge-shell .btn-outline-secondary {
+    color: #cbd5e1;
+    border-color: #64748b;
+}
+
+[data-bs-theme="dark"] .judge-shell .btn-outline-secondary:hover {
+    background: #334155;
+    color: #f8fafc;
+    border-color: #64748b;
 }
 
 .judge-avatar {
@@ -423,9 +509,9 @@
     gap: 0.5rem;
     align-items: center;
     padding: 0.4rem 0.5rem;
-    border: 1px solid #e9ecef;
+    border: 1px solid var(--jg-line);
     border-radius: 0.5rem;
-    background: #f8f9fa;
+    background: var(--jg-surface-alt);
 }
 
 @keyframes judgePulseOnline {

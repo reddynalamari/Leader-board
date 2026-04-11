@@ -3,6 +3,7 @@
 {% block title %}Manage Teams{% endblock %}
 
 {% block content %}
+<section class="admin-teams-shell">
 <div class="row align-items-center mb-4">
     <div class="col-md-8">
         <h2 class="mb-0 fw-bold text-dark"><i class="bi bi-people me-2 text-primary"></i>Manage Teams</h2>
@@ -134,6 +135,8 @@
     </div>
 </div>
 
+</section>
+
 <div id="team-reorder-config" data-endpoint="{{ url_for('admin.reorder_teams') }}" hidden></div>
 
 <script>
@@ -255,33 +258,113 @@
 </script>
 
 <style>
-.team-table > :not(caption) > * > * {
+.admin-teams-shell {
+    --tm-ink: #0f172a;
+    --tm-soft: #64748b;
+    --tm-surface: #ffffff;
+    --tm-surface-alt: #f8fafc;
+    --tm-line: #e2e8f0;
+    --tm-shadow: 0 0.5rem 1rem rgba(15, 23, 42, 0.08);
+    color: var(--tm-ink);
+}
+
+[data-bs-theme="dark"] .admin-teams-shell {
+    --tm-ink: #e2e8f0;
+    --tm-soft: #94a3b8;
+    --tm-surface: #1e293b;
+    --tm-surface-alt: #0f172a;
+    --tm-line: rgba(148, 163, 184, 0.28);
+    --tm-shadow: 0 0.75rem 1.25rem rgba(2, 6, 23, 0.35);
+}
+
+.admin-teams-shell .text-dark,
+.admin-teams-shell h1,
+.admin-teams-shell h2,
+.admin-teams-shell h3,
+.admin-teams-shell h4,
+.admin-teams-shell h5,
+.admin-teams-shell h6 {
+    color: var(--tm-ink) !important;
+}
+
+.admin-teams-shell .text-muted {
+    color: var(--tm-soft) !important;
+}
+
+.admin-teams-shell .card {
+    background: var(--tm-surface);
+    border-color: var(--tm-line) !important;
+    box-shadow: var(--tm-shadow) !important;
+}
+
+.admin-teams-shell .table {
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--tm-ink);
+    --bs-table-border-color: var(--tm-line);
+    --bs-table-hover-bg: rgba(14, 165, 233, 0.08);
+}
+
+.admin-teams-shell .table-light {
+    --bs-table-bg: var(--tm-surface-alt);
+    --bs-table-color: var(--tm-soft);
+}
+
+.admin-teams-shell .team-table > :not(caption) > * > * {
     vertical-align: middle;
 }
 
-.team-row-draggable.dragging {
-    opacity: 0.5;
-    background: #eef4ff;
+.admin-teams-shell .team-row-draggable.dragging {
+    opacity: 0.55;
+    background: rgba(14, 165, 233, 0.15);
 }
 
-.team-order-handle {
-    color: #6c757d;
+.admin-teams-shell .team-order-handle {
+    color: var(--tm-soft);
     cursor: grab;
 }
 
-.team-link-input {
+.admin-teams-shell .form-control,
+.admin-teams-shell .form-select,
+.admin-teams-shell .input-group-text {
+    background: var(--tm-surface-alt);
+    color: var(--tm-ink);
+    border-color: var(--tm-line);
+}
+
+.admin-teams-shell .form-control::placeholder {
+    color: var(--tm-soft);
+}
+
+.admin-teams-shell .badge.text-bg-light {
+    background: var(--tm-surface-alt) !important;
+    color: var(--tm-ink) !important;
+    border-color: var(--tm-line) !important;
+}
+
+.admin-teams-shell .team-link-input {
     max-width: 130px;
 }
 
-.team-link-item {
+.admin-teams-shell .team-link-item {
     display: grid;
     grid-template-columns: minmax(120px, 1fr) auto auto;
     align-items: center;
     gap: 0.5rem;
-    border: 1px solid #e9ecef;
+    border: 1px solid var(--tm-line);
     border-radius: 0.5rem;
-    background: #f8f9fa;
+    background: var(--tm-surface-alt);
     padding: 0.45rem 0.5rem;
+}
+
+[data-bs-theme="dark"] .admin-teams-shell .btn-outline-dark {
+    color: #cbd5e1;
+    border-color: #64748b;
+}
+
+[data-bs-theme="dark"] .admin-teams-shell .btn-outline-dark:hover {
+    background: #334155;
+    color: #f8fafc;
+    border-color: #64748b;
 }
 </style>
 {% endblock %}

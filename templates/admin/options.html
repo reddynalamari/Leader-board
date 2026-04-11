@@ -3,6 +3,7 @@
 {% block title %}Manage Options{% endblock %}
 
 {% block content %}
+<section class="admin-options-shell">
 <div class="row align-items-center mb-4">
     <div class="col-md-8">
         <h2 class="mb-0 fw-bold text-dark"><i class="bi bi-sliders me-2 text-primary"></i>Manage Options</h2>
@@ -205,4 +206,94 @@
         </div>
     </div>
 </div>
+
+</section>
+
+<style>
+.admin-options-shell {
+    --op-ink: #0f172a;
+    --op-soft: #64748b;
+    --op-surface: #ffffff;
+    --op-surface-alt: #f8fafc;
+    --op-line: #e2e8f0;
+    --op-shadow: 0 0.5rem 1rem rgba(15, 23, 42, 0.08);
+    color: var(--op-ink);
+}
+
+[data-bs-theme="dark"] .admin-options-shell {
+    --op-ink: #e2e8f0;
+    --op-soft: #94a3b8;
+    --op-surface: #1e293b;
+    --op-surface-alt: #0f172a;
+    --op-line: rgba(148, 163, 184, 0.28);
+    --op-shadow: 0 0.75rem 1.25rem rgba(2, 6, 23, 0.35);
+}
+
+.admin-options-shell .text-dark,
+.admin-options-shell h1,
+.admin-options-shell h2,
+.admin-options-shell h3,
+.admin-options-shell h4,
+.admin-options-shell h5,
+.admin-options-shell h6 {
+    color: var(--op-ink) !important;
+}
+
+.admin-options-shell .text-muted,
+.admin-options-shell .text-secondary,
+.admin-options-shell .form-text {
+    color: var(--op-soft) !important;
+}
+
+.admin-options-shell .card {
+    background: var(--op-surface);
+    border-color: var(--op-line) !important;
+    box-shadow: var(--op-shadow) !important;
+}
+
+.admin-options-shell .card-header.bg-white {
+    background: transparent !important;
+    border-color: var(--op-line) !important;
+}
+
+.admin-options-shell .bg-light-subtle {
+    background: var(--op-surface-alt) !important;
+    border-color: var(--op-line) !important;
+}
+
+.admin-options-shell .table {
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--op-ink);
+    --bs-table-border-color: var(--op-line);
+    --bs-table-hover-bg: rgba(14, 165, 233, 0.08);
+}
+
+.admin-options-shell .table-light {
+    --bs-table-bg: var(--op-surface-alt);
+    --bs-table-color: var(--op-soft);
+}
+
+.admin-options-shell .form-control,
+.admin-options-shell .form-select,
+.admin-options-shell .input-group-text {
+    background: var(--op-surface-alt);
+    color: var(--op-ink);
+    border-color: var(--op-line);
+}
+
+.admin-options-shell .form-control::placeholder {
+    color: var(--op-soft);
+}
+
+[data-bs-theme="dark"] .admin-options-shell .btn-outline-secondary {
+    color: #cbd5e1;
+    border-color: #64748b;
+}
+
+[data-bs-theme="dark"] .admin-options-shell .btn-outline-secondary:hover {
+    background: #334155;
+    color: #f8fafc;
+    border-color: #64748b;
+}
+</style>
 {% endblock %}

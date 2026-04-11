@@ -3,6 +3,7 @@
 {% block title %}Presentation Control{% endblock %}
 
 {% block content %}
+<section class="admin-presentation-shell">
 {% if previous_team_id %}
 <a
     class="team-side-nav team-side-nav-left"
@@ -282,6 +283,8 @@
     </div>
 </div>
 
+</section>
+
 <div
     id="presentation-timer-config"
     data-initial-running="{{ 'true' if timer_snapshot.running else 'false' }}"
@@ -295,14 +298,119 @@
 </div>
 
 <style>
-.presentation-clock {
+.admin-presentation-shell {
+    --pr-ink: #0f172a;
+    --pr-soft: #64748b;
+    --pr-surface: #ffffff;
+    --pr-surface-alt: #f8fafc;
+    --pr-line: #e2e8f0;
+    --pr-shadow: 0 0.5rem 1rem rgba(15, 23, 42, 0.08);
+    color: var(--pr-ink);
+}
+
+[data-bs-theme="dark"] .admin-presentation-shell {
+    --pr-ink: #e2e8f0;
+    --pr-soft: #94a3b8;
+    --pr-surface: #1e293b;
+    --pr-surface-alt: #0f172a;
+    --pr-line: rgba(148, 163, 184, 0.28);
+    --pr-shadow: 0 0.75rem 1.25rem rgba(2, 6, 23, 0.35);
+}
+
+.admin-presentation-shell .text-dark,
+.admin-presentation-shell h1,
+.admin-presentation-shell h2,
+.admin-presentation-shell h3,
+.admin-presentation-shell h4,
+.admin-presentation-shell h5,
+.admin-presentation-shell h6 {
+    color: var(--pr-ink) !important;
+}
+
+.admin-presentation-shell .text-muted {
+    color: var(--pr-soft) !important;
+}
+
+.admin-presentation-shell .card {
+    background: var(--pr-surface);
+    border-color: var(--pr-line) !important;
+    box-shadow: var(--pr-shadow) !important;
+}
+
+.admin-presentation-shell .card-header.bg-white,
+.admin-presentation-shell .card-footer.bg-white {
+    background: transparent !important;
+    border-color: var(--pr-line) !important;
+}
+
+.admin-presentation-shell .table {
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--pr-ink);
+    --bs-table-border-color: var(--pr-line);
+    --bs-table-hover-bg: rgba(14, 165, 233, 0.08);
+}
+
+.admin-presentation-shell .table-light {
+    --bs-table-bg: var(--pr-surface-alt);
+    --bs-table-color: var(--pr-soft);
+}
+
+.admin-presentation-shell .badge.text-bg-light {
+    background: var(--pr-surface-alt) !important;
+    color: var(--pr-ink) !important;
+    border-color: var(--pr-line) !important;
+}
+
+.admin-presentation-shell .team-side-nav {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #0f172a;
+    color: #f8fafc;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    text-decoration: none;
+    z-index: 100;
+    box-shadow: 0 0.5rem 1rem rgba(15, 23, 42, 0.25);
+}
+
+[data-bs-theme="dark"] .admin-presentation-shell .team-side-nav {
+    background: #f8fafc;
+    color: #0f172a;
+}
+
+.admin-presentation-shell .team-side-nav:hover {
+    background: #0d6efd;
+    color: #ffffff;
+}
+
+.admin-presentation-shell .team-side-nav-left {
+    left: 0.75rem;
+}
+
+.admin-presentation-shell .team-side-nav-right {
+    right: 0.75rem;
+}
+
+@media (max-width: 1200px) {
+    .admin-presentation-shell .team-side-nav {
+        display: none;
+    }
+}
+
+.admin-presentation-shell .presentation-clock {
     font-size: 2rem;
     font-weight: 700;
     letter-spacing: 0.02em;
     line-height: 1;
 }
 
-.presentation-overtime-banner {
+.admin-presentation-shell .presentation-overtime-banner {
     border: 1px solid rgba(220, 53, 69, 0.4);
     background: rgba(220, 53, 69, 0.08);
 }
@@ -311,21 +419,34 @@ body.presentation-overtime {
     background: #ffe5e8;
 }
 
-body.presentation-overtime .presentation-timer-card {
+body.presentation-overtime .admin-presentation-shell .presentation-timer-card {
     border: 1px solid rgba(220, 53, 69, 0.6) !important;
     background: #fff1f3;
 }
 
-body.presentation-overtime .team-side-nav {
+body.presentation-overtime .admin-presentation-shell .team-side-nav {
     background: #dc3545;
 }
 
-body.presentation-overtime .team-side-nav:hover {
+body.presentation-overtime .admin-presentation-shell .team-side-nav:hover {
     background: #b02a37;
 }
 
 body.presentation-overtime .navbar {
     background: #6f1d1b !important;
+}
+
+[data-bs-theme="dark"] body.presentation-overtime {
+    background: #2b1118 !important;
+}
+
+[data-bs-theme="dark"] body.presentation-overtime .admin-presentation-shell .presentation-timer-card {
+    background: #3b1720;
+    border-color: rgba(248, 113, 113, 0.45) !important;
+}
+
+[data-bs-theme="dark"] body.presentation-overtime .navbar {
+    background: #4a1017 !important;
 }
 </style>
 
