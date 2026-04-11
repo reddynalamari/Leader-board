@@ -140,9 +140,7 @@ def save_or_update_judge_scores(
     lock_after_save=False,
 ):
     existing_rows = Score.query.filter_by(judge_id=judge_id, team_id=team_id).all()
-    if existing_rows and any(bool(row.is_locked) for row in existing_rows):
-        raise ValueError("Scores are locked for this team and cannot be edited.")
-
+    
     rules_map = get_scoring_rules_map()
     existing_by_category = {row.category: row for row in existing_rows}
 
@@ -228,9 +226,7 @@ def save_or_update_judge_scores(
         if not rows_to_lock:
             raise ValueError("Cannot lock scores before saving all categories.")
 
-        if any(bool(row.is_locked) for row in rows_to_lock):
-            raise ValueError("Scores are already locked for this team.")
-
+        
         for row in rows_to_lock:
             row.is_locked = True
             _add_audit_log(

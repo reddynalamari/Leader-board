@@ -440,8 +440,7 @@
     const presentationStateUrl = "{{ url_for('admin.presentation_timer_state') }}";
     const currentTeamElement = document.getElementById('judge-presentation-current');
     const nextTeamElement = document.getElementById('judge-presentation-next');
-    const statusElement = document.getElementById('judge-presentation-status');
-    const currentTeamLink = document.getElementById('judge-current-team-link');
+        const currentTeamLink = document.getElementById('judge-current-team-link');
     const nextTeamLink = document.getElementById('judge-next-team-link');
 
     function applyTeamLink(linkElement, teamId, teamName) {
@@ -477,7 +476,7 @@
     }
 
     async function refreshPresentationFocus() {
-        if (!currentTeamElement || !nextTeamElement || !statusElement) {
+        if (!currentTeamElement || !nextTeamElement ) {
             return;
         }
 
@@ -494,11 +493,7 @@
 
             currentTeamElement.textContent = payload.current_team_name || '-';
             nextTeamElement.textContent = payload.next_team_name || '-';
-            statusElement.textContent = payload.running ? 'Running' : 'Paused';
-            statusElement.classList.toggle('is-running', Boolean(payload.running));
-            statusElement.classList.toggle('is-paused', !payload.running);
-
-            applyTeamLink(currentTeamLink, payload.current_team_id, payload.current_team_name);
+                                                applyTeamLink(currentTeamLink, payload.current_team_id, payload.current_team_name);
             applyTeamLink(nextTeamLink, payload.next_team_id, payload.next_team_name);
         } catch (error) {
             // Ignore temporary polling errors.

@@ -83,9 +83,7 @@ def score_team(team_id):
         action = request.form.get("action", "save")
 
         if action == "clear":
-            if is_judge_team_locked(judge_profile.id, team.id):
-                flash("Scores are locked for this team and cannot be cleared.", "warning")
-                return redirect(url_for("judge.score_team", team_id=team.id))
+            
 
             try:
                 deleted_rows = (
@@ -124,13 +122,11 @@ def score_team(team_id):
 
             return redirect(url_for("judge.score_team", team_id=team.id))
 
-        if is_judge_team_locked(judge_profile.id, team.id):
-            flash("Scores are locked for this team and cannot be edited.", "warning")
-            return redirect(url_for("judge.score_team", team_id=team.id))
+        
 
         raw_scores = {item["key"]: request.form.get(item["key"], "").strip() for item in category_definitions}
         remarks = request.form.get("remarks", "").strip()
-        lock_after_save = action == "save_lock"
+        lock_after_save = False
 
         try:
             for item in category_definitions:
@@ -144,13 +140,10 @@ def score_team(team_id):
                 raw_scores=raw_scores,
                 remarks=remarks,
                 actor_user_id=current_user.id,
-                lock_after_save=lock_after_save,
+                lock_after_save=False,
             )
 
-            if lock_after_save:
-                flash("Scores saved and locked successfully.", "success")
-            else:
-                flash("Scores saved successfully.", "success")
+            flash("Scores saved successfully.", "success")
 
             if action == "save_next":
                 next_team_id = get_next_active_team_id(team.id)
