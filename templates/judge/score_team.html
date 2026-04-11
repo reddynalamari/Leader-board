@@ -52,11 +52,7 @@
 
     <form method="post" class="judge-form-card">
         <div class="card-body p-4">
-            {% if existing_snapshot.is_locked %}
-            <div class="judge-lock-banner mb-3" role="alert">
-                This scorecard is locked. Editing is disabled.
-            </div>
-            {% endif %}
+            
 
             <div class="row g-3">
                 {% for category in category_definitions %}
@@ -79,7 +75,7 @@
                             max="{{ category.max_score }}"
                             step="0.01"
                             value="{{ score_values.get(category.key) if score_values.get(category.key) is not none else '' }}"
-                            {% if existing_snapshot.is_locked %}disabled{% endif %}
+                            
                             required>
                         <div class="form-text mt-2">Range: 0 to {{ '%.2f'|format(category.max_score) }}</div>
                     </div>
@@ -89,7 +85,7 @@
                 <div class="col-12">
                     <div class="judge-remarks-card">
                         <label for="remarks" class="form-label fw-semibold">Remarks (Optional)</label>
-                        <textarea id="remarks" name="remarks" class="form-control judge-remarks-input" rows="3" {% if existing_snapshot.is_locked %}disabled{% endif %}>{{ remarks }}</textarea>
+                        <textarea id="remarks" name="remarks" class="form-control judge-remarks-input" rows="3" >{{ remarks }}</textarea>
                     </div>
                 </div>
 
@@ -108,9 +104,7 @@
         </div>
 
         <div class="card-footer bg-white d-flex justify-content-end gap-2 flex-wrap px-4 pb-4 border-0">
-            {% if existing_snapshot.is_locked %}
-            <a href="{{ url_for('judge.dashboard') }}" class="btn judge-btn-ghost">Back to Dashboard</a>
-            {% else %}
+            
             <button
                 type="submit"
                 name="action"
@@ -122,8 +116,7 @@
             </button>
             <button type="submit" name="action" value="save" class="btn judge-btn-primary">Save Scores</button>
             <button type="submit" name="action" value="save_next" class="btn judge-btn-outline">Save and Next Team</button>
-            <button type="submit" name="action" value="save_lock" class="btn judge-btn-dark">Save and Lock</button>
-            {% endif %}
+            
         </div>
     </form>
 </section>
@@ -423,11 +416,18 @@
     }
 }
 
+[data-bs-theme="dark"] .judge-score-shell::before { display: none; }
+[data-bs-theme="dark"] .judge-score-shell::after { display: none; }
 [data-bs-theme="dark"] .judge-score-shell { --ink: #e2e8f0; --ink-soft: #94a3b8; --surface: #1e293b; --line: rgba(255, 255, 255, 0.1); }
-[data-bs-theme="dark"] .judge-score-hero { background: linear-gradient(115deg, #1e293b, #0f172a); border-color: var(--line); color: var(--ink); }
-[data-bs-theme="dark"] .judge-meta-card { background: #0f172a; border-color: var(--line); color: var(--ink); }
-[data-bs-theme="dark"] .judge-form-card { background: #1e293b; border-color: var(--line); color: var(--ink); }
-[data-bs-theme="dark"] .judge-category-card { background: #0f172a; border-color: var(--line); color: var(--ink); }
+[data-bs-theme="dark"] .judge-score-hero { background: linear-gradient(115deg, #1e293b, #0f172a); border-color: var(--line); color: #e2e8f0; }
+[data-bs-theme="dark"] .judge-score-hero p { color: #94a3b8 !important; }
+[data-bs-theme="dark"] .judge-score-hero h2 { color: #e2e8f0; }
+[data-bs-theme="dark"] .judge-meta-card { background: #0f172a; border-color: var(--line); color: #e2e8f0; }
+[data-bs-theme="dark"] .judge-meta-card label { color: #94a3b8 !important; }
+[data-bs-theme="dark"] .judge-form-card { background: #1e293b; border-color: var(--line); color: #e2e8f0; }
+[data-bs-theme="dark"] .judge-category-card { background: #0f172a; border-color: var(--line); color: #e2e8f0; }
+[data-bs-theme="dark"] .judge-category-card label { color: #e2e8f0; }
+[data-bs-theme="dark"] .judge-remarks-card label { color: #e2e8f0; }
 [data-bs-theme="dark"] .judge-score-input, [data-bs-theme="dark"] .judge-remarks-input { background: #1e293b; border-color: var(--line); color: #e2e8f0; }
 [data-bs-theme="dark"] .judge-score-input:focus, [data-bs-theme="dark"] .judge-remarks-input:focus { background: #0f172a; border-color: var(--brand); color: #e2e8f0; }
 [data-bs-theme="dark"] .judge-total-panel { background: #0f172a; border-color: var(--line); color: var(--ink); }

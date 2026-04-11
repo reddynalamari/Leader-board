@@ -8,9 +8,7 @@
     {% if team.is_completed %}
         {% set stats.completed = stats.completed + 1 %}
     {% endif %}
-    {% if team.is_locked %}
-        {% set stats.locked = stats.locked + 1 %}
-    {% endif %}
+    
 {% endfor %}
 
 <section class="judge-dash-shell">
@@ -29,10 +27,7 @@
                 <span>Completed</span>
                 <strong>{{ stats.completed }}</strong>
             </div>
-            <div class="judge-metric-card">
-                <span>Locked</span>
-                <strong>{{ stats.locked }}</strong>
-            </div>
+            
         </div>
     </div>
 
@@ -46,10 +41,7 @@
                 <span class="chip-label">Next Team</span>
                 <strong id="judge-presentation-next">Loading...</strong>
             </div>
-            <div class="judge-focus-chip">
-                <span class="chip-label">Timer State</span>
-                <strong id="judge-presentation-status" class="status-chip">Loading...</strong>
-            </div>
+            
         </div>
         <div class="d-flex gap-2 flex-wrap">
             <a id="judge-current-team-link" class="btn btn-sm judge-btn-primary disabled" href="#" aria-disabled="true">Open Current Team</a>
@@ -71,7 +63,7 @@
                         <th>Theme</th>
                         <th>Project</th>
                         <th>Progress</th>
-                        <th>Lock</th>
+                        
                         <th>Your Total</th>
                         <th>Action</th>
                     </tr>
@@ -102,13 +94,7 @@
                                 <div class="judge-progress-fill" style="width: {{ '%.0f'|format(progress_percent) }}%;"></div>
                             </div>
                         </td>
-                        <td>
-                            {% if team.is_locked %}
-                                <span class="badge judge-badge-locked">Locked</span>
-                            {% else %}
-                                <span class="badge judge-badge-editable">Editable</span>
-                            {% endif %}
-                        </td>
+                        
                         <td>
                             <span class="judge-score-pill">{{ '%.2f'|format(team.judge_total) }}</span>
                         </td>
@@ -431,14 +417,19 @@
     }
 }
 
+[data-bs-theme="dark"] .judge-dash-shell::before,
+[data-bs-theme="dark"] .judge-dash-shell::after { display: none; }
 [data-bs-theme="dark"] .judge-dash-shell { --ink: #e2e8f0; --ink-soft: #94a3b8; --surface: #1e293b; --line: rgba(255, 255, 255, 0.1); }
-[data-bs-theme="dark"] .judge-dash-hero { background: linear-gradient(130deg, #1e293b, #0f172a); border-color: rgba(255, 255, 255, 0.1); box-shadow: 0 14px 32px rgba(0,0,0, 0.4); color: var(--ink); }
-[data-bs-theme="dark"] .judge-metric-card { background: #0f172a; box-shadow: none; border-color: rgba(255, 255, 255, 0.1); color: var(--ink); }
-[data-bs-theme="dark"] .judge-focus-card { background: linear-gradient(90deg, rgba(6, 123, 194, 0.15), rgba(0, 166, 166, 0.15)); border-color: rgba(6, 123, 194, 0.3); color: var(--ink); }
-[data-bs-theme="dark"] .judge-focus-chip { background: rgba(15, 23, 42, 0.8); border-color: rgba(255, 255, 255, 0.1); color: var(--ink); }
-[data-bs-theme="dark"] .judge-table-card { background: #1e293b; border-color: rgba(255, 255, 255, 0.1); }
-[data-bs-theme="dark"] .judge-table { color: var(--ink); }
-[data-bs-theme="dark"] .text-dark { color: var(--ink) !important; }
+[data-bs-theme="dark"] .judge-dash-hero { background: linear-gradient(130deg, #1e293b, #0f172a); border-color: rgba(255, 255, 255, 0.1); box-shadow: 0 14px 32px rgba(0,0,0, 0.4); color: #e2e8f0; }
+[data-bs-theme="dark"] .judge-dash-hero h2 { color: #e2e8f0; }
+[data-bs-theme="dark"] .judge-dash-hero p { color: #94a3b8 !important; }
+[data-bs-theme="dark"] .judge-metric-card { background: #0f172a; box-shadow: none; border-color: rgba(255, 255, 255, 0.1); color: #e2e8f0; }
+[data-bs-theme="dark"] .judge-focus-card { background: linear-gradient(90deg, rgba(6, 123, 194, 0.15), rgba(0, 166, 166, 0.15)); border-color: rgba(6, 123, 194, 0.3); color: #e2e8f0; }
+[data-bs-theme="dark"] .judge-focus-chip { background: rgba(15, 23, 42, 0.8); border-color: rgba(255, 255, 255, 0.1); color: #e2e8f0; }
+[data-bs-theme="dark"] .judge-table-card { background: #1e293b; border-color: rgba(255, 255, 255, 0.1); color: #e2e8f0; }
+[data-bs-theme="dark"] .judge-table { color: #e2e8f0; }
+[data-bs-theme="dark"] .judge-table th { color: #94a3b8; }
+[data-bs-theme="dark"] .text-dark { color: #e2e8f0 !important; }
 [data-bs-theme="dark"] .card { background: #1e293b; }
 
 </style>
