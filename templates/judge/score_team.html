@@ -71,7 +71,10 @@
         <!-- Right Column: Scoring Form -->
         <div class="col-xl-8 col-lg-7">
             <form method="post" class="judge-form-card position-relative">
-                <div class="card-header bg-transparent border-bottom px-4 py-3 d-flex justify-content-between align-items-center">
+                <div class="card-header bg-transparent border-bottom px-4 py-3 d-flex justify-content-between align-items-center position-relative overflow-hidden">
+                    <div class="position-absolute bottom-0 start-0 w-100 bg-secondary bg-opacity-10" style="height: 4px;">
+                        <div id="score-progress-bar" class="bg-success h-100" style="width: {% if existing_snapshot %}{{ (existing_snapshot.categories_scored / 4) * 100 }}{% else %}0{% endif %}%; transition: width 0.3s ease;"></div>
+                    </div>
                     <h5 class="mb-0 fw-bold judge-heading"><i class="bi bi-ui-checks-grid me-2 text-success"></i> Scorecard</h5>
                     <span class="badge badge-hint border fw-normal"><i class="bi bi-keyboard me-1"></i> Use arrow keys to navigate</span>
                 </div>
@@ -119,7 +122,7 @@
                             <div class="judge-total-panel p-3 d-flex justify-content-between align-items-center flex-wrap">
                                 <div>
                                     <div class="text-uppercase small fw-bold text-muted mb-1"><i class="bi bi-calculator me-1"></i> Live Metric</div>
-                                    <div class="small fw-medium category-label">Saved Categories: <span class="badge bg-success ms-1 rounded-pill">{{ existing_snapshot.categories_scored }} / 4</span></div>
+                                    <div class="small fw-medium category-label">Saved Categories: <span id="saved-categories-badge" class="badge bg-success ms-1 rounded-pill">{{ existing_snapshot.categories_scored }} / 4</span></div>
                                 </div>
                                 <div class="text-end">
                                     <div class="text-uppercase small fw-bold text-muted mb-1">Weighted Total</div>
@@ -469,17 +472,47 @@ textarea::placeholder { color: var(--ink-soft); opacity: 0.6; }
     const inputs = document.querySelectorAll('.score-input');
     const liveTotalEl = document.getElementById('live-total');
     
+    const catBadge = document.getElementById('saved-categories-badge');
+    const progressBar = document.getElementById('score-progress-bar');
+    
     function updateTotal() {
         if (!liveTotalEl) return;
         let total = 0;
+        let categoriesFilled = 0;
+        
         inputs.forEach(input => {
-            const val = parseFloat(input.value);
-            const mul = parseFloat(input.dataset.multiplier);
-            if (!isNaN(val) && !isNaN(mul)) {
-                total += val * mul;
+            const maxScore = parseFloat(input.dataset.maxScore || 10);
+            
+            if (input.value !== '') {
+                // Auto-cap max limit
+                let val = parseFloat(input.value);
+                if (val > maxScore) {
+                    input.value = maxScore;
+                    val = maxScore;
+                } else if (val < 0) {
+                    input.value = 0;
+                    val = 0;
+                }
+                
+                if (!isNaN(val) && val >= 0) {
+                    categoriesFilled++;
+                    const mul = parseFloat(input.dataset.multiplier);
+                    if (!isNaN(mul)) {
+                        total += val * mul;
+                    }
+                }
             }
         });
+        
         liveTotalEl.textContent = total.toFixed(2);
+        
+        if (catBadge) {
+            catBadge.textContent = `${categoriesFilled} / ${inputs.length}`;
+        }
+        if (progressBar) {
+            const percent = (categoriesFilled / inputs.length) * 100;
+            progressBar.style.width = percent + '%';
+        }
     }
     
     inputs.forEach(input => {
