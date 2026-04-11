@@ -45,10 +45,54 @@
 </script>
 
 <style>
+[data-bs-theme="light"] body,
+[data-bs-theme="dark"] body,
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
 [data-bs-theme="dark"] body { background-color: #0f172a !important; color: #e2e8f0; }
 [data-bs-theme="dark"] .offcanvas { background: #1e293b; color: #e2e8f0; }
 [data-bs-theme="dark"] .text-secondary { color: #94a3b8 !important; }
 [data-bs-theme="dark"] .bg-white { background: #1e293b !important; }
+
+main.container {
+    flex: 1 0 auto;
+}
+
+.app-footer {
+    flex-shrink: 0;
+    border-top: 1px solid rgba(148, 163, 184, 0.35);
+    background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
+    padding: 0.55rem 0;
+    color: #64748b;
+    font-size: 0.82rem;
+}
+
+.app-footer .footer-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 0.28rem 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+
+[data-bs-theme="dark"] .app-footer {
+    border-top-color: rgba(148, 163, 184, 0.25);
+    background: linear-gradient(180deg, #111827 0%, #0b1220 100%);
+    color: #94a3b8;
+}
+
+[data-bs-theme="dark"] .app-footer .footer-pill {
+    border-color: rgba(148, 163, 184, 0.3);
+    background: rgba(30, 41, 59, 0.72);
+}
 
 .theme-toggle {
     position: relative;
@@ -269,6 +313,16 @@
 
     {% block content %}{% endblock %}
 </main>
+
+<footer class="app-footer">
+    <div class="container text-center">
+        <span class="footer-pill">
+            <i class="bi bi-stars"></i>
+            Powered by Innovista Team &mdash; Crafted with care for CorpTech's Ideathon 2026
+        </span>
+    </div>
+</footer>
+
 {% if current_user.is_authenticated %}
 <div class="offcanvas offcanvas-end" tabindex="-1" id="contextGuideOffcanvas" aria-labelledby="contextGuideOffcanvasLabel">
   <div class="offcanvas-header bg-dark text-white">
