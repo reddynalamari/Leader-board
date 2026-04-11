@@ -1,0 +1,66 @@
+<svg width="1400" height="500" viewBox="0 0 1400 500" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Feature Matrix</title>
+  <desc id="desc">Feature matrix by platform module and role</desc>
+  <rect width="1400" height="500" fill="#f8fafc"/>
+  <text x="700" y="52" text-anchor="middle" font-size="34" font-family="Segoe UI, Arial, sans-serif" font-weight="700" fill="#0f172a">Feature Matrix</text>
+  <text x="700" y="83" text-anchor="middle" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#64748b">Coverage across Admin, Judge, Team, and Public experiences</text>
+
+  <rect x="70" y="120" width="1260" height="320" rx="14" fill="#ffffff" stroke="#cbd5e1"/>
+
+  <rect x="70" y="120" width="360" height="60" fill="#e2e8f0"/>
+  <rect x="430" y="120" width="240" height="60" fill="#dbeafe"/>
+  <rect x="670" y="120" width="220" height="60" fill="#e0e7ff"/>
+  <rect x="890" y="120" width="220" height="60" fill="#ccfbf1"/>
+  <rect x="1110" y="120" width="220" height="60" fill="#dcfce7"/>
+
+  <text x="250" y="158" text-anchor="middle" font-size="22" font-family="Segoe UI, Arial, sans-serif" font-weight="700" fill="#0f172a">Capability</text>
+  <text x="550" y="158" text-anchor="middle" font-size="22" font-family="Segoe UI, Arial, sans-serif" font-weight="700" fill="#1e3a8a">Admin</text>
+  <text x="780" y="158" text-anchor="middle" font-size="22" font-family="Segoe UI, Arial, sans-serif" font-weight="700" fill="#3730a3">Judge</text>
+  <text x="1000" y="158" text-anchor="middle" font-size="22" font-family="Segoe UI, Arial, sans-serif" font-weight="700" fill="#0f766e">Team</text>
+  <text x="1220" y="158" text-anchor="middle" font-size="22" font-family="Segoe UI, Arial, sans-serif" font-weight="700" fill="#166534">Public</text>
+
+  <g font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">
+    <text x="96" y="222">Team and project management</text>
+    <text x="96" y="272">Judge scoring workflow</text>
+    <text x="96" y="322">Live ranking visibility</text>
+    <text x="96" y="372">Direct access links</text>
+    <text x="96" y="422">Bulk data import and preview</text>
+  </g>
+
+  <g font-size="28" font-family="Segoe UI, Arial, sans-serif" font-weight="700">
+    <text x="550" y="224" text-anchor="middle" fill="#0f766e">YES</text>
+    <text x="780" y="224" text-anchor="middle" fill="#94a3b8">-</text>
+    <text x="1000" y="224" text-anchor="middle" fill="#94a3b8">-</text>
+    <text x="1220" y="224" text-anchor="middle" fill="#94a3b8">-</text>
+
+    <text x="550" y="274" text-anchor="middle" fill="#94a3b8">-</text>
+    <text x="780" y="274" text-anchor="middle" fill="#0f766e">YES</text>
+    <text x="1000" y="274" text-anchor="middle" fill="#94a3b8">-</text>
+    <text x="1220" y="274" text-anchor="middle" fill="#94a3b8">-</text>
+
+    <text x="550" y="324" text-anchor="middle" fill="#0f766e">YES</text>
+    <text x="780" y="324" text-anchor="middle" fill="#0f766e">YES</text>
+    <text x="1000" y="324" text-anchor="middle" fill="#0f766e">YES</text>
+    <text x="1220" y="324" text-anchor="middle" fill="#0f766e">YES</text>
+
+    <text x="550" y="374" text-anchor="middle" fill="#0f766e">YES</text>
+    <text x="780" y="374" text-anchor="middle" fill="#0f766e">YES</text>
+    <text x="1000" y="374" text-anchor="middle" fill="#0f766e">YES</text>
+    <text x="1220" y="374" text-anchor="middle" fill="#94a3b8">-</text>
+
+    <text x="550" y="424" text-anchor="middle" fill="#0f766e">YES</text>
+    <text x="780" y="424" text-anchor="middle" fill="#94a3b8">-</text>
+    <text x="1000" y="424" text-anchor="middle" fill="#94a3b8">-</text>
+    <text x="1220" y="424" text-anchor="middle" fill="#94a3b8">-</text>
+  </g>
+
+  <line x1="70" y1="180" x2="1330" y2="180" stroke="#cbd5e1"/>
+  <line x1="70" y1="230" x2="1330" y2="230" stroke="#e2e8f0"/>
+  <line x1="70" y1="280" x2="1330" y2="280" stroke="#e2e8f0"/>
+  <line x1="70" y1="330" x2="1330" y2="330" stroke="#e2e8f0"/>
+  <line x1="70" y1="380" x2="1330" y2="380" stroke="#e2e8f0"/>
+  <line x1="430" y1="120" x2="430" y2="440" stroke="#cbd5e1"/>
+  <line x1="670" y1="120" x2="670" y2="440" stroke="#cbd5e1"/>
+  <line x1="890" y1="120" x2="890" y2="440" stroke="#cbd5e1"/>
+  <line x1="1110" y1="120" x2="1110" y2="440" stroke="#cbd5e1"/>
+</svg>

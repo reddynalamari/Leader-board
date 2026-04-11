@@ -1,0 +1,35 @@
+<svg width="1400" height="340" viewBox="0 0 1400 340" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Scoring Pipeline</title>
+  <desc id="desc">Pipeline from raw scoring input to live ranking output</desc>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="8" refX="11" refY="4" orient="auto">
+      <polygon points="0 0, 12 4, 0 8" fill="#334155"/>
+    </marker>
+  </defs>
+  <rect width="1400" height="340" fill="#f8fafc"/>
+  <text x="700" y="50" text-anchor="middle" font-size="34" font-family="Segoe UI, Arial, sans-serif" font-weight="700" fill="#0f172a">Scoring to Ranking Pipeline</text>
+
+  <rect x="80" y="110" width="220" height="150" rx="14" fill="#dbeafe" stroke="#60a5fa"/>
+  <text x="190" y="152" text-anchor="middle" font-size="20" font-family="Segoe UI, Arial, sans-serif" font-weight="700" fill="#1e3a8a">Judge Input</text>
+  <text x="104" y="188" font-size="16" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- Raw scores per category</text>
+  <text x="104" y="214" font-size="16" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- Remarks and save actions</text>
+
+  <rect x="350" y="110" width="260" height="150" rx="14" fill="#e0e7ff" stroke="#818cf8"/>
+  <text x="480" y="152" text-anchor="middle" font-size="20" font-family="Segoe UI, Arial, sans-serif" font-weight="700" fill="#3730a3">Validation Layer</text>
+  <text x="374" y="188" font-size="16" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- Required fields</text>
+  <text x="374" y="214" font-size="16" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- Score clamping to max</text>
+
+  <rect x="660" y="110" width="280" height="150" rx="14" fill="#dcfce7" stroke="#4ade80"/>
+  <text x="800" y="152" text-anchor="middle" font-size="20" font-family="Segoe UI, Arial, sans-serif" font-weight="700" fill="#14532d">Weighted Calculation</text>
+  <text x="684" y="188" font-size="16" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- Category weight lookup</text>
+  <text x="684" y="214" font-size="16" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- Weighted score persistence</text>
+
+  <rect x="990" y="110" width="320" height="150" rx="14" fill="#ccfbf1" stroke="#14b8a6"/>
+  <text x="1150" y="152" text-anchor="middle" font-size="20" font-family="Segoe UI, Arial, sans-serif" font-weight="700" fill="#134e4a">Live Scoreboard</text>
+  <text x="1014" y="188" font-size="16" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- Aggregated totals by team</text>
+  <text x="1014" y="214" font-size="16" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- Tie-break ordering + ranks</text>
+
+  <line x1="300" y1="185" x2="350" y2="185" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+  <line x1="610" y1="185" x2="660" y2="185" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+  <line x1="940" y1="185" x2="990" y2="185" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+</svg>

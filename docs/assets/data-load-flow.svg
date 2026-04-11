@@ -1,0 +1,46 @@
+<svg width="1400" height="330" viewBox="0 0 1400 330" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Data Load Flow</title>
+  <desc id="desc">Visual flow of the admin bulk data load process</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#334155" />
+    </marker>
+  </defs>
+  <rect width="1400" height="330" fill="#f8fafc"/>
+  <text x="700" y="52" text-anchor="middle" font-size="34" font-family="Segoe UI, Arial, sans-serif" font-weight="700" fill="#0f172a">Bulk Data Load Workflow</text>
+
+  <rect x="70" y="112" width="220" height="146" rx="16" fill="#dbeafe" stroke="#60a5fa"/>
+  <text x="180" y="150" text-anchor="middle" font-size="20" font-family="Segoe UI, Arial, sans-serif" font-weight="700" fill="#1e3a8a">1. Prepare JSON</text>
+  <text x="94" y="185" font-size="16" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">Download template</text>
+  <text x="94" y="210" font-size="16" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">Fill teams, judges</text>
+  <text x="94" y="235" font-size="16" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">Set options/rules</text>
+
+  <rect x="340" y="112" width="220" height="146" rx="16" fill="#dcfce7" stroke="#4ade80"/>
+  <text x="450" y="150" text-anchor="middle" font-size="20" font-family="Segoe UI, Arial, sans-serif" font-weight="700" fill="#14532d">2. Preview</text>
+  <text x="364" y="185" font-size="16" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">Upload or paste JSON</text>
+  <text x="364" y="210" font-size="16" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">Validate structure</text>
+  <text x="364" y="235" font-size="16" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">Review operations</text>
+
+  <rect x="610" y="112" width="220" height="146" rx="16" fill="#fef3c7" stroke="#f59e0b"/>
+  <text x="720" y="150" text-anchor="middle" font-size="20" font-family="Segoe UI, Arial, sans-serif" font-weight="700" fill="#78350f">3. Select Mode</text>
+  <text x="634" y="185" font-size="16" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">Append data</text>
+  <text x="634" y="210" font-size="16" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">or Clear + Load</text>
+  <text x="634" y="235" font-size="16" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">Admin password required</text>
+
+  <rect x="880" y="112" width="220" height="146" rx="16" fill="#e0e7ff" stroke="#818cf8"/>
+  <text x="990" y="150" text-anchor="middle" font-size="20" font-family="Segoe UI, Arial, sans-serif" font-weight="700" fill="#3730a3">4. Import</text>
+  <text x="904" y="185" font-size="16" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">Apply payload</text>
+  <text x="904" y="210" font-size="16" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">Create/update records</text>
+  <text x="904" y="235" font-size="16" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">Commit transaction</text>
+
+  <rect x="1150" y="112" width="220" height="146" rx="16" fill="#ccfbf1" stroke="#14b8a6"/>
+  <text x="1260" y="150" text-anchor="middle" font-size="20" font-family="Segoe UI, Arial, sans-serif" font-weight="700" fill="#134e4a">5. Verify</text>
+  <text x="1174" y="185" font-size="16" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">Check summary</text>
+  <text x="1174" y="210" font-size="16" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">Validate portals</text>
+  <text x="1174" y="235" font-size="16" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">Start event flow</text>
+
+  <line x1="290" y1="185" x2="340" y2="185" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+  <line x1="560" y1="185" x2="610" y2="185" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+  <line x1="830" y1="185" x2="880" y2="185" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+  <line x1="1100" y1="185" x2="1150" y2="185" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+</svg>

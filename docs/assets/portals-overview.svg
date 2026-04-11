@@ -1,0 +1,39 @@
+<svg width="1400" height="470" viewBox="0 0 1400 470" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Portal Overview</title>
+  <desc id="desc">Overview cards for Admin, Judge, Public, and Team portal experiences</desc>
+  <rect width="1400" height="470" fill="#f8fafc"/>
+  <text x="700" y="54" text-anchor="middle" font-size="34" font-family="Segoe UI, Arial, sans-serif" font-weight="700" fill="#0f172a">Role Experiences at a Glance</text>
+  <text x="700" y="86" text-anchor="middle" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#64748b">Each portal is optimized for a specific event responsibility</text>
+
+  <rect x="72" y="122" width="298" height="282" rx="20" fill="#0ea5e9" fill-opacity="0.12" stroke="#0284c7"/>
+  <text x="102" y="170" font-size="30" font-family="Segoe UI Emoji, Segoe UI, Arial, sans-serif">🛠️</text>
+  <text x="152" y="168" font-size="30" font-family="Segoe UI, Arial, sans-serif" font-weight="700" fill="#075985">Admin</text>
+  <text x="102" y="208" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- Team and judge management</text>
+  <text x="102" y="236" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- Presentation queue control</text>
+  <text x="102" y="264" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- Scoring and option tuning</text>
+  <text x="102" y="292" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- Bulk JSON data loading</text>
+
+  <rect x="391" y="122" width="298" height="282" rx="20" fill="#2563eb" fill-opacity="0.12" stroke="#1d4ed8"/>
+  <text x="421" y="170" font-size="30" font-family="Segoe UI Emoji, Segoe UI, Arial, sans-serif">🧑‍⚖️</text>
+  <text x="471" y="168" font-size="30" font-family="Segoe UI, Arial, sans-serif" font-weight="700" fill="#1e3a8a">Judge</text>
+  <text x="421" y="208" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- Team-by-team scoring</text>
+  <text x="421" y="236" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- Save and save-next workflow</text>
+  <text x="421" y="264" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- Score editing and clearing</text>
+  <text x="421" y="292" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- Presence heartbeat tracking</text>
+
+  <rect x="710" y="122" width="298" height="282" rx="20" fill="#0d9488" fill-opacity="0.12" stroke="#0f766e"/>
+  <text x="740" y="170" font-size="30" font-family="Segoe UI Emoji, Segoe UI, Arial, sans-serif">📊</text>
+  <text x="790" y="168" font-size="30" font-family="Segoe UI, Arial, sans-serif" font-weight="700" fill="#115e59">Public</text>
+  <text x="740" y="208" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- Live ranked scoreboard</text>
+  <text x="740" y="236" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- Tie-break visibility</text>
+  <text x="740" y="264" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- Unified login portal</text>
+  <text x="740" y="292" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- Public event transparency</text>
+
+  <rect x="1029" y="122" width="298" height="282" rx="20" fill="#0891b2" fill-opacity="0.12" stroke="#0e7490"/>
+  <text x="1059" y="170" font-size="30" font-family="Segoe UI Emoji, Segoe UI, Arial, sans-serif">👥</text>
+  <text x="1109" y="168" font-size="30" font-family="Segoe UI, Arial, sans-serif" font-weight="700" fill="#155e75">Team</text>
+  <text x="1059" y="208" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- Team portal access</text>
+  <text x="1059" y="236" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- Members and project details</text>
+  <text x="1059" y="264" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- Judge score breakdown</text>
+  <text x="1059" y="292" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- Direct-link entry support</text>
+</svg>

@@ -1,0 +1,32 @@
+<svg width="1400" height="360" viewBox="0 0 1400 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Event Lifecycle</title>
+  <desc id="desc">Before, during, and after event operations lifecycle</desc>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="8" refX="11" refY="4" orient="auto">
+      <polygon points="0 0, 12 4, 0 8" fill="#334155"/>
+    </marker>
+  </defs>
+  <rect width="1400" height="360" fill="#f8fafc"/>
+  <text x="700" y="52" text-anchor="middle" font-size="34" font-family="Segoe UI, Arial, sans-serif" font-weight="700" fill="#0f172a">Event Lifecycle Playbook</text>
+
+  <rect x="90" y="106" width="360" height="200" rx="18" fill="#dbeafe" stroke="#60a5fa"/>
+  <text x="270" y="148" text-anchor="middle" font-size="28" font-family="Segoe UI, Arial, sans-serif" font-weight="700" fill="#1e3a8a">Before Event</text>
+  <text x="118" y="186" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- Configure options and scoring rules</text>
+  <text x="118" y="214" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- Load teams, judges, members</text>
+  <text x="118" y="242" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- Validate access and health checks</text>
+
+  <rect x="520" y="106" width="360" height="200" rx="18" fill="#dcfce7" stroke="#4ade80"/>
+  <text x="700" y="148" text-anchor="middle" font-size="28" font-family="Segoe UI, Arial, sans-serif" font-weight="700" fill="#14532d">During Event</text>
+  <text x="548" y="186" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- Run presentation queue + timer</text>
+  <text x="548" y="214" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- Capture judge scoring live</text>
+  <text x="548" y="242" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- Monitor requests and scoreboard</text>
+
+  <rect x="950" y="106" width="360" height="200" rx="18" fill="#fef3c7" stroke="#f59e0b"/>
+  <text x="1130" y="148" text-anchor="middle" font-size="28" font-family="Segoe UI, Arial, sans-serif" font-weight="700" fill="#78350f">After Event</text>
+  <text x="978" y="186" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- Finalize results and export data</text>
+  <text x="978" y="214" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- Revoke temporary direct links</text>
+  <text x="978" y="242" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- Reset for next cycle if needed</text>
+
+  <line x1="450" y1="206" x2="520" y2="206" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+  <line x1="880" y1="206" x2="950" y2="206" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+</svg>

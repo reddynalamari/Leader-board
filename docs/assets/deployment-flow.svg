@@ -1,0 +1,38 @@
+<svg width="1400" height="350" viewBox="0 0 1400 350" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Deployment Flow</title>
+  <desc id="desc">Deployment path from repository to Render runtime</desc>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="8" refX="11" refY="4" orient="auto">
+      <polygon points="0 0, 12 4, 0 8" fill="#334155"/>
+    </marker>
+  </defs>
+  <rect width="1400" height="350" fill="#f8fafc"/>
+  <text x="700" y="48" text-anchor="middle" font-size="34" font-family="Segoe UI, Arial, sans-serif" font-weight="700" fill="#0f172a">Deployment Flow (Render)</text>
+
+  <rect x="90" y="110" width="260" height="170" rx="16" fill="#dbeafe" stroke="#60a5fa"/>
+  <text x="220" y="152" text-anchor="middle" font-size="22" font-family="Segoe UI, Arial, sans-serif" font-weight="700" fill="#1e3a8a">Repository</text>
+  <text x="114" y="188" font-size="17" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- Source code</text>
+  <text x="114" y="214" font-size="17" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- README + diagrams</text>
+  <text x="114" y="240" font-size="17" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- requirements.txt</text>
+
+  <rect x="430" y="110" width="260" height="170" rx="16" fill="#e0e7ff" stroke="#818cf8"/>
+  <text x="560" y="152" text-anchor="middle" font-size="22" font-family="Segoe UI, Arial, sans-serif" font-weight="700" fill="#3730a3">Build Stage</text>
+  <text x="454" y="188" font-size="17" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- pip install -r requirements.txt</text>
+  <text x="454" y="214" font-size="17" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- Environment variables injected</text>
+  <text x="454" y="240" font-size="17" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- Start command prepared</text>
+
+  <rect x="770" y="110" width="260" height="170" rx="16" fill="#dcfce7" stroke="#4ade80"/>
+  <text x="900" y="152" text-anchor="middle" font-size="22" font-family="Segoe UI, Arial, sans-serif" font-weight="700" fill="#14532d">Runtime</text>
+  <text x="794" y="188" font-size="17" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- gunicorn app:app</text>
+  <text x="794" y="214" font-size="17" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- Health endpoint checks</text>
+  <text x="794" y="240" font-size="17" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- Auto schema compatibility path</text>
+
+  <rect x="1110" y="110" width="220" height="170" rx="16" fill="#fef3c7" stroke="#f59e0b"/>
+  <text x="1220" y="152" text-anchor="middle" font-size="22" font-family="Segoe UI, Arial, sans-serif" font-weight="700" fill="#78350f">Database</text>
+  <text x="1134" y="188" font-size="17" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">PostgreSQL</text>
+  <text x="1134" y="214" font-size="17" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">Neon/Supabase</text>
+
+  <line x1="350" y1="195" x2="430" y2="195" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+  <line x1="690" y1="195" x2="770" y2="195" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+  <line x1="1030" y1="195" x2="1110" y2="195" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+</svg>

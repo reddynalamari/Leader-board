@@ -1,0 +1,51 @@
+<svg width="1400" height="540" viewBox="0 0 1400 540" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Architecture Overview</title>
+  <desc id="desc">High-level architecture showing UI, Flask blueprints, services, and PostgreSQL</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#475569" />
+    </marker>
+  </defs>
+  <rect width="1400" height="540" fill="#f8fafc"/>
+  <text x="700" y="50" text-anchor="middle" font-size="36" font-family="Segoe UI, Arial, sans-serif" font-weight="700" fill="#0f172a">System Architecture</text>
+
+  <rect x="74" y="112" width="290" height="300" rx="18" fill="#dbeafe" stroke="#60a5fa"/>
+  <text x="219" y="150" text-anchor="middle" font-size="24" font-family="Segoe UI, Arial, sans-serif" font-weight="700" fill="#1e3a8a">Client Layer</text>
+  <text x="104" y="194" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- Browser UI (Bootstrap + Jinja)</text>
+  <text x="104" y="226" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- Admin Portal</text>
+  <text x="104" y="258" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- Judge Portal</text>
+  <text x="104" y="290" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- Team Portal</text>
+  <text x="104" y="322" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- Public Scoreboard</text>
+
+  <rect x="446" y="86" width="500" height="352" rx="18" fill="#dcfce7" stroke="#4ade80"/>
+  <text x="696" y="126" text-anchor="middle" font-size="24" font-family="Segoe UI, Arial, sans-serif" font-weight="700" fill="#14532d">Flask Application Layer</text>
+
+  <rect x="478" y="148" width="150" height="74" rx="12" fill="#ffffff" stroke="#86efac"/>
+  <text x="553" y="192" text-anchor="middle" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#166534">public.py</text>
+
+  <rect x="646" y="148" width="150" height="74" rx="12" fill="#ffffff" stroke="#86efac"/>
+  <text x="721" y="192" text-anchor="middle" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#166534">admin.py</text>
+
+  <rect x="814" y="148" width="100" height="74" rx="12" fill="#ffffff" stroke="#86efac"/>
+  <text x="864" y="192" text-anchor="middle" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#166534">judge.py</text>
+
+  <rect x="478" y="250" width="436" height="72" rx="12" fill="#ffffff" stroke="#86efac"/>
+  <text x="696" y="294" text-anchor="middle" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#166534">Service Layer (scoring, presence, data-load, auth helpers)</text>
+
+  <rect x="478" y="344" width="436" height="66" rx="12" fill="#ffffff" stroke="#86efac"/>
+  <text x="696" y="386" text-anchor="middle" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#166534">Models + SQLAlchemy ORM</text>
+
+  <rect x="1032" y="152" width="292" height="258" rx="18" fill="#fef3c7" stroke="#f59e0b"/>
+  <text x="1178" y="194" text-anchor="middle" font-size="24" font-family="Segoe UI, Arial, sans-serif" font-weight="700" fill="#78350f">PostgreSQL</text>
+  <text x="1062" y="236" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- users, judges, teams</text>
+  <text x="1062" y="268" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- projects, team_members</text>
+  <text x="1062" y="300" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- scores + scoring settings</text>
+  <text x="1062" y="332" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- direct links + requests</text>
+  <text x="1062" y="364" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#0f172a">- options + system settings</text>
+
+  <line x1="364" y1="262" x2="446" y2="262" stroke="#475569" stroke-width="3" marker-end="url(#arrow)"/>
+  <line x1="946" y1="262" x2="1032" y2="262" stroke="#475569" stroke-width="3" marker-end="url(#arrow)"/>
+  <line x1="1032" y1="302" x2="946" y2="302" stroke="#94a3b8" stroke-width="2.5" marker-end="url(#arrow)"/>
+
+  <text x="700" y="500" text-anchor="middle" font-size="17" font-family="Segoe UI, Arial, sans-serif" fill="#64748b">Request flow: Browser -> Flask Blueprints -> Services -> ORM -> PostgreSQL</text>
+</svg>

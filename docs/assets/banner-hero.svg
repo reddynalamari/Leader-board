@@ -1,0 +1,37 @@
+<svg width="1400" height="360" viewBox="0 0 1400 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Leader-board Ideathon Scoreboard</title>
+  <desc id="desc">Hero banner for the ideathon scoreboard project documentation</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="55%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0b1220"/>
+    </linearGradient>
+    <linearGradient id="line" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#22d3ee" stop-opacity="0.1"/>
+      <stop offset="50%" stop-color="#22d3ee" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#22d3ee" stop-opacity="0.1"/>
+    </linearGradient>
+  </defs>
+  <rect width="1400" height="360" fill="url(#bg)"/>
+  <circle cx="1160" cy="80" r="150" fill="#38bdf8" fill-opacity="0.12"/>
+  <circle cx="1270" cy="220" r="120" fill="#14b8a6" fill-opacity="0.11"/>
+  <circle cx="130" cy="290" r="105" fill="#2563eb" fill-opacity="0.15"/>
+  <rect x="0" y="284" width="1400" height="2" fill="url(#line)"/>
+
+  <text x="88" y="118" font-size="24" font-family="Segoe UI, Arial, sans-serif" fill="#38bdf8" letter-spacing="2">IDEATHON OPERATIONS PLATFORM</text>
+  <text x="88" y="178" font-size="54" font-family="Segoe UI, Arial, sans-serif" font-weight="700" fill="#f8fafc">Leader-board</text>
+  <text x="88" y="226" font-size="28" font-family="Segoe UI, Arial, sans-serif" fill="#cbd5e1">Flask-powered Admin, Judge, Team, and Live Scoreboard Experience</text>
+
+  <rect x="88" y="252" width="126" height="40" rx="20" fill="#0ea5e9"/>
+  <text x="151" y="278" text-anchor="middle" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#f8fafc" font-weight="600">ADMIN</text>
+
+  <rect x="228" y="252" width="126" height="40" rx="20" fill="#2563eb"/>
+  <text x="291" y="278" text-anchor="middle" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#f8fafc" font-weight="600">JUDGE</text>
+
+  <rect x="368" y="252" width="126" height="40" rx="20" fill="#0891b2"/>
+  <text x="431" y="278" text-anchor="middle" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#f8fafc" font-weight="600">PUBLIC</text>
+
+  <rect x="508" y="252" width="126" height="40" rx="20" fill="#0d9488"/>
+  <text x="571" y="278" text-anchor="middle" font-size="18" font-family="Segoe UI, Arial, sans-serif" fill="#f8fafc" font-weight="600">TEAM</text>
+</svg>
